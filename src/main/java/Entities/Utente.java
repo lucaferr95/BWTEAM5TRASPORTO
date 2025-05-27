@@ -22,6 +22,12 @@ private TipoUtente tipoUtente;
 
 public  Utente() {}
 
+    public Utente(String nome, String cognome, TipoUtente tipoUtente) {
+        this.nome = nome;
+        this.cognome = cognome;
+        this.tipoUtente = tipoUtente;
+    }
+
     public String getNome() {
         return nome;
     }
@@ -44,6 +50,10 @@ public  Utente() {}
 
     public void setTipoUtente(TipoUtente tipoUtente) {
         this.tipoUtente = tipoUtente;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override
