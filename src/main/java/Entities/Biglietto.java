@@ -26,13 +26,13 @@ public class Biglietto {
 
     @ManyToOne
     @JoinColumn(name = "mezzo_id")
-    private Mezzo mezzo;
+    private Mezzi mezzo;
 
     public Biglietto() {
     }
 
     public Biglietto(LocalDate dataEmissione, boolean validazione, LocalDate dataValidazione,
-                     Rivenditore rivenditore, Utente utente, Mezzo mezzo) {
+                     Rivenditore rivenditore, Utente utente, Mezzi mezzo) {
         this.dataEmissione = dataEmissione;
         this.validazione = validazione;
         this.dataValidazione = dataValidazione;
@@ -85,11 +85,11 @@ public class Biglietto {
         this.utente = utente;
     }
 
-    public Mezzo getMezzo() {
+    public Mezzi getMezzo() {
         return mezzo;
     }
 
-    public void setMezzo(Mezzo mezzo) {
+    public void setMezzo(Mezzi mezzo) {
         this.mezzo = mezzo;
     }
 
