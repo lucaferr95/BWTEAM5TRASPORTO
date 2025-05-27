@@ -3,10 +3,16 @@ package Entities;
 import Enumeration.TipoUtente;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table (name="utenti")
 
+
 public class Utente {
+    @OneToMany( mappedBy = "utente")
+    private List<Biglietto> biglietti;
+
 @Id
 @GeneratedValue
 private int id;

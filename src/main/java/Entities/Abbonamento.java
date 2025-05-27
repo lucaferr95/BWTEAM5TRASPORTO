@@ -1,5 +1,6 @@
 package Entities;
 
+import Enumeration.TipoAbbonamento;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -10,21 +11,22 @@ public class Abbonamento extends TitoloDiViaggio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String tipo;
+    @Column(name = "tipo_abbonamento")
+    @Enumerated(EnumType.STRING)
+    private TipoAbbonamento tipoAbbonamento;
+
 
     @ManyToOne
     @JoinColumn(name = "utente_id")
     private Utente utente;
-
+    @Column( name = "data_scadenza")
     private LocalDate dataScadenza;
 
     public Abbonamento() {
     }
 
-    public Abbonamento(LocalDate dataEmissione, Rivenditore rivenditore, String tipo,
-                       Utente utente, LocalDate dataScadenza) {
-        super(dataEmissione, rivenditore);
-        this.tipo = tipo;
+    public Abbonamento(TipoAbbonamento tipoAbbonamento, Utente utente, LocalDate dataScadenza) {
+        this.tipoAbbonamento = tipoAbbonamento;
         this.utente = utente;
         this.dataScadenza = dataScadenza;
     }
@@ -33,12 +35,12 @@ public class Abbonamento extends TitoloDiViaggio {
         return id;
     }
 
-    public String getTipo() {
-        return tipo;
+    public TipoAbbonamento getTipoAbbonamento() {
+        return tipoAbbonamento;
     }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setTipoAbbonamento(TipoAbbonamento tipoAbbonamento) {
+        this.tipoAbbonamento = tipoAbbonamento;
     }
 
     public Utente getUtente() {
@@ -61,11 +63,11 @@ public class Abbonamento extends TitoloDiViaggio {
     public String toString() {
         return "Abbonamento{" +
                 "id=" + id +
-                ", tipo='" + tipo + '\'' +
+                ", tipo='" + tipoAbbonamento + '\'' +
                 ", utente=" + (utente != null ? utente.getId() : null) +
                 ", dataScadenza=" + dataScadenza +
                 ", dataEmissione=" + dataEmissione +
                 ", rivenditore=" + (rivenditore != null ? rivenditore.getId() : null) +
-                '}';
+                '}'+ super.toString();
     }
 }

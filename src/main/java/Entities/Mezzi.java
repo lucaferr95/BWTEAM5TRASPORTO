@@ -4,7 +4,7 @@ import Enumeration.TipoMezzo;
 import jakarta.persistence.*;
 
 import java.util.List;
-
+// Giulia
 @Entity
 @Table(name = "mezzi")
 public class Mezzi {
@@ -20,6 +20,8 @@ public class Mezzi {
     private int posti;
     @Column(name = "numero_vidimazioni")
     private int numerovidimazioni;
+    @OneToMany(mappedBy = "mezzi")
+    private Tratta tratta;
 
     @OneToMany(mappedBy = "mezzi")
     private List<PeriodicoManutenzione> serviziManutenzioni;
@@ -28,13 +30,21 @@ public class Mezzi {
     public Mezzi() {
     }
 
-    public Mezzi(TipoMezzo tipoMezzo, String statoAttuale, boolean validazione, int posti, int numerovidimazioni, List<PeriodicoManutenzione> serviziManutenzioni) {
+    public Mezzi(TipoMezzo tipoMezzo, String statoAttuale, boolean validazione, int posti, int numerovidimazioni, Tratta tratta) {
         this.tipoMezzo = tipoMezzo;
         this.statoAttuale = statoAttuale;
         this.validazione = validazione;
         this.posti = posti;
         this.numerovidimazioni = numerovidimazioni;
-        this.serviziManutenzioni = serviziManutenzioni;
+        this.tratta = tratta;
+    }
+
+    public Tratta getTratta() {
+        return tratta;
+    }
+
+    public void setTratta(Tratta tratta) {
+        this.tratta = tratta;
     }
 
     public Long getId() {
@@ -102,6 +112,7 @@ public class Mezzi {
                 ", validazione=" + validazione +
                 ", posti=" + posti +
                 ", numerovidimazioni=" + numerovidimazioni +
+                ", tratta=" + tratta +
                 ", serviziManutenzioni=" + serviziManutenzioni +
                 '}';
     }

@@ -5,13 +5,15 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
+@Table(name = "tratte")
 public class Tratta {
 
-    @OneToOne
-    @MapsId
-    @Id
-    private int id;
 
+    @Id
+    @GeneratedValue
+    private int id;
+    @ManyToOne
+    @JoinColumn( name = "mezzi_id")
     private Mezzi mezzo;
 
     @Column(name = "tempo_effettivo")
@@ -84,8 +86,8 @@ public class Tratta {
         this.capolinea = capolinea;
     }
 
-    public Tratta(int id, Mezzi mezzo, LocalTime tempoEffettivo, String nomeTratta, String zonaDiPartenza, LocalTime tempoPrevisto, String capolinea) {
-        this.id = id;
+    public Tratta( Mezzi mezzo, LocalTime tempoEffettivo, String nomeTratta, String zonaDiPartenza, LocalTime tempoPrevisto, String capolinea) {
+
         this.mezzo = mezzo;
         this.tempoEffettivo = tempoEffettivo;
         this.nomeTratta = nomeTratta;

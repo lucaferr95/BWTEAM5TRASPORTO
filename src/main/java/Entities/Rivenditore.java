@@ -17,33 +17,34 @@ public abstract class Rivenditore {
     @GeneratedValue
     private int id;
 
-    //@OneToMany(mappedBy = "rivenditore")
-    private List<Abbonamento> venditeAbbonamenti;
-    //@OneToMany(mappedBy = "rivenditore")
-    private List<Biglietto> venditeBiglietti;
+    @OneToMany(mappedBy = "rivenditore")
+    private List<TitoloDiViaggio> titoloDiViaggio;
 
-    // constructor
 
-    public Rivenditore(List<Abbonamento> venditeAbbonamenti, List<Biglietto> venditeBiglietti) {
-        this.venditeAbbonamenti = venditeAbbonamenti;
-        this.venditeBiglietti = venditeBiglietti;
-    }
 
-    public Rivenditore() {
-    }
 
-    // to string
+
+
 
     @Override
     public String toString() {
         return "Rivenditore{" +
                 "id=" + id +
-                ", venditeAbbonamenti=" + venditeAbbonamenti +
-                ", venditeBiglietti=" + venditeBiglietti +
+                ", titoloDiViaggio=" + titoloDiViaggio +
                 '}';
     }
 
-    //get set
+    public Rivenditore() {
+    }
+
+    public List<TitoloDiViaggio> getTitoloDiViaggio() {
+        return titoloDiViaggio;
+    }
+
+    public void setTitoloDiViaggio(List<TitoloDiViaggio> titoloDiViaggio) {
+        this.titoloDiViaggio = titoloDiViaggio;
+    }
+
 
     public int getId() {
         return id;
@@ -52,20 +53,7 @@ public abstract class Rivenditore {
     public void setId(int id) {
         this.id = id;
     }
-
-    public List<Abbonamento> getVenditeAbbonamenti() {
-        return venditeAbbonamenti;
-    }
-
-    public void setVenditeAbbonamenti(List<Abbonamento> venditeAbbonamenti) {
-        this.venditeAbbonamenti = venditeAbbonamenti;
-    }
-
-    public List<Biglietto> getVenditeBiglietti() {
-        return venditeBiglietti;
-    }
-
-    public void setVenditeBiglietti(List<Biglietto> venditeBiglietti) {
-        this.venditeBiglietti = venditeBiglietti;
-    }
 }
+
+
+

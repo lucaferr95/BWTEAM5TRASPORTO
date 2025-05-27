@@ -13,8 +13,8 @@ public class Macchinetta extends Rivenditore {
 
     // constructor
 
-    public Macchinetta(List<Abbonamento> venditeAbbonamenti, List<Biglietto> venditeBiglietti, boolean inFunzione) {
-        super(venditeAbbonamenti, venditeBiglietti);
+
+    public Macchinetta(boolean inFunzione) {
         this.inFunzione = inFunzione;
     }
 

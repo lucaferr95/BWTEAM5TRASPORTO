@@ -1,18 +1,35 @@
 package Entities;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "titoli_viaggi")
 public abstract class TitoloDiViaggio {
-
+    @Column(name = "data_emissione")
     protected LocalDate dataEmissione;
+    @ManyToOne
+    @JoinColumn( name = "rivenditore_id")
     protected Rivenditore rivenditore;
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public TitoloDiViaggio() {
     }
 
-    public TitoloDiViaggio(LocalDate dataEmissione, Rivenditore rivenditore) {
+    public TitoloDiViaggio(LocalDate dataEmissione ) {
         this.dataEmissione = dataEmissione;
-        this.rivenditore = rivenditore;
+
     }
 
     public LocalDate getDataEmissione() {
@@ -35,7 +52,8 @@ public abstract class TitoloDiViaggio {
     public String toString() {
         return "TitoloDiViaggio{" +
                 "dataEmissione=" + dataEmissione +
-                ", rivenditore=" + (rivenditore != null ? rivenditore.getId() : null) +
+                ", rivenditore=" + rivenditore +
+                ", id=" + id +
                 '}';
     }
 }

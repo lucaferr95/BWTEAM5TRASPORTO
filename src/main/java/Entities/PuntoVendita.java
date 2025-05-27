@@ -13,8 +13,8 @@ public class PuntoVendita extends Rivenditore {
 
     // constructor
 
-    public PuntoVendita(List<Abbonamento> venditeAbbonamenti, List<Biglietto> venditeBiglietti, boolean aperto) {
-        super(venditeAbbonamenti, venditeBiglietti);
+
+    public PuntoVendita(boolean aperto) {
         this.aperto = aperto;
     }
 

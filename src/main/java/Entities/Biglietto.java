@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table( name = "biglietti")
 public class Biglietto {
 
     @Id
@@ -16,9 +17,7 @@ public class Biglietto {
 
     private LocalDate dataValidazione;
 
-    @ManyToOne
-    @JoinColumn(name = "rivenditore_id")
-    private Rivenditore rivenditore;
+
 
     @ManyToOne
     @JoinColumn(name = "utente_id")
@@ -32,11 +31,11 @@ public class Biglietto {
     }
 
     public Biglietto(LocalDate dataEmissione, boolean validazione, LocalDate dataValidazione,
-                     Rivenditore rivenditore, Utente utente, Mezzi mezzo) {
+                      Utente utente, Mezzi mezzo) {
         this.dataEmissione = dataEmissione;
         this.validazione = validazione;
         this.dataValidazione = dataValidazione;
-        this.rivenditore = rivenditore;
+
         this.utente = utente;
         this.mezzo = mezzo;
     }
@@ -69,13 +68,7 @@ public class Biglietto {
         this.dataValidazione = dataValidazione;
     }
 
-    public Rivenditore getRivenditore() {
-        return rivenditore;
-    }
 
-    public void setRivenditore(Rivenditore rivenditore) {
-        this.rivenditore = rivenditore;
-    }
 
     public Utente getUtente() {
         return utente;
@@ -100,9 +93,9 @@ public class Biglietto {
                 ", dataEmissione=" + dataEmissione +
                 ", validazione=" + validazione +
                 ", dataValidazione=" + dataValidazione +
-                ", rivenditore=" + (rivenditore != null ? rivenditore.getId() : null) +
+
                 ", utente=" + (utente != null ? utente.getId() : null) +
                 ", mezzo=" + (mezzo != null ? mezzo.getId() : null) +
-                '}';
+                '}'+super.toString();
     }
 }
