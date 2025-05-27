@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+@NamedQuery(
+        name = "Rivenditore.findAll",
+        query = "SELECT r FROM Rivenditore r"
+)
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_rivenditore")

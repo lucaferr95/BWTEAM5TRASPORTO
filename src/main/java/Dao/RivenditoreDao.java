@@ -1,7 +1,12 @@
 package Dao;
 
+import Entities.Biglietto;
 import Entities.Rivenditore;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class RivenditoreDao {
     private EntityManager em;
@@ -31,4 +36,36 @@ public class RivenditoreDao {
         }
     }
 
+    /* ------------------- metodi ------------------- */
+
+    // lista di rivenditori
+    public List<Rivenditore> getAll() {
+        TypedQuery<Rivenditore> query = em.createNamedQuery("Rivenditore.findAll", Rivenditore.class);
+        return query.getResultList();
+    }
+
+    // quanti biglietti per periodo
+    public long countBigliettiEmessiPerPeriodo(int rivenditoreId, LocalDateTime start, LocalDateTime end) {
+        TypedQuery<Long> query = em.createQuery(
+                "SELECT COUNT(b) FROM Biglietto b WHERE b.rivenditore.id = :id AND b.dataEmissione BETWEEN :start AND :end",
+                Long.class
+        );
+        query.setParameter("id", rivenditoreId);
+        query.setParameter("start", start);
+        query.setParameter("end", end);
+
+        return query.getSingleResult();
+    }
+
+    // totale biglietti emessi
+
+    public List<Biglietto> getBigliettiByRivenditore(int rivenditoreId) {
+        TypedQuery<Biglietto> query = em.createQuery(
+                "SELECT b FROM Biglietto b WHERE b.rivenditore.id = :id", Biglietto.class
+        );
+        query.setParameter("id", rivenditoreId);
+        return query.getResultList();
+    }
+
 }
+
