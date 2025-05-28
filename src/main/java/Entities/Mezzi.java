@@ -1,6 +1,7 @@
 package Entities;
 
 import Enumeration.TipoMezzo;
+import Enumeration.TipoPeriodicoManutenzione;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -13,15 +14,16 @@ public class Mezzi {
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_mezzo")
-    TipoMezzo tipoMezzo;
+    private TipoMezzo tipoMezzo;
     @Column(name = "stato_attuale")
-    private String statoAttuale;
-    private boolean validazione;
+    @Enumerated(EnumType.STRING)
+    private TipoPeriodicoManutenzione statoAttuale;
+
     private int posti;
     @Column(name = "numero_vidimazioni")
     private int numerovidimazioni;
-    @OneToMany(mappedBy = "mezzi")
-    private Tratta tratta;
+    @OneToMany(mappedBy = "mezzo")
+    private List<Tratta> tratte;
 
     @OneToMany(mappedBy = "mezzi")
     private List<PeriodicoManutenzione> serviziManutenzioni;
@@ -30,21 +32,21 @@ public class Mezzi {
     public Mezzi() {
     }
 
-    public Mezzi(TipoMezzo tipoMezzo, String statoAttuale, boolean validazione, int posti, int numerovidimazioni, Tratta tratta) {
-        this.tipoMezzo = tipoMezzo;
+
+    public List<Tratta> getTratte() {
+        return tratte;
+    }
+
+    public void setTratte(List<Tratta> tratte) {
+        this.tratte = tratte;
+    }
+
+    public TipoPeriodicoManutenzione getStatoAttuale() {
+        return statoAttuale;
+    }
+
+    public void setStatoAttuale(TipoPeriodicoManutenzione statoAttuale) {
         this.statoAttuale = statoAttuale;
-        this.validazione = validazione;
-        this.posti = posti;
-        this.numerovidimazioni = numerovidimazioni;
-        this.tratta = tratta;
-    }
-
-    public Tratta getTratta() {
-        return tratta;
-    }
-
-    public void setTratta(Tratta tratta) {
-        this.tratta = tratta;
     }
 
     public Long getId() {
@@ -63,21 +65,6 @@ public class Mezzi {
         this.tipoMezzo = tipoMezzo;
     }
 
-    public String getStatoAttuale() {
-        return statoAttuale;
-    }
-
-    public void setStatoAttuale(String statoAttuale) {
-        this.statoAttuale = statoAttuale;
-    }
-
-    public boolean isValidazione() {
-        return validazione;
-    }
-
-    public void setValidazione(boolean validazione) {
-        this.validazione = validazione;
-    }
 
     public int getPosti() {
         return posti;
@@ -103,18 +90,23 @@ public class Mezzi {
         this.serviziManutenzioni = serviziManutenzioni;
     }
 
+    public Mezzi(TipoMezzo tipoMezzo, TipoPeriodicoManutenzione statoAttuale, int posti, int numerovidimazioni) {
+        this.tipoMezzo = tipoMezzo;
+        this.statoAttuale = statoAttuale;
+        this.posti = posti;
+        this.numerovidimazioni = numerovidimazioni;
+    }
+
     @Override
     public String toString() {
         return "Mezzi{" +
                 "id=" + id +
                 ", tipoMezzo=" + tipoMezzo +
-                ", statoAttuale='" + statoAttuale + '\'' +
-                ", validazione=" + validazione +
+                ", statoAttuale=" + statoAttuale +
                 ", posti=" + posti +
                 ", numerovidimazioni=" + numerovidimazioni +
-                ", tratta=" + tratta +
+                ", tratte=" + tratte +
                 ", serviziManutenzioni=" + serviziManutenzioni +
                 '}';
     }
-
 }

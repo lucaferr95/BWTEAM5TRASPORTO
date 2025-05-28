@@ -33,19 +33,20 @@ public class Main {
         // MENU
 
         int scelta = -1;
-        while (scelta !=0){
-            try{
-
+        while (scelta != 0) {
+            try {
                 System.out.println("Welcome user!");
                 System.out.println("1 - Esegui il Login");
                 System.out.println("2 - Registrazione");
                 System.out.println("0 - Esci");
 
 
+                scelta = Integer.parseInt(scanner.nextLine());
+
             } catch (NumberFormatException e) {
                 System.out.println("Inserisci un numero valido.");
+                continue;
             }
-
             switch (scelta){
                 case 1->{
                     try {
@@ -211,12 +212,12 @@ public class Main {
                 case "1" -> {
                     System.out.print("Tipo mezzo (TRAM/AUTOBUS): ");
                     TipoMezzo tipo = TipoMezzo.valueOf(scanner.nextLine().toUpperCase());
-                    System.out.print("Stato attuale: ");
-                    String stato = scanner.nextLine();
+                    System.out.print("Stato attuale (IN_SERVIZIO/IN_MANUTENZIONE): ");
+                    TipoPeriodicoManutenzione stato = TipoPeriodicoManutenzione.valueOf(scanner.nextLine().toUpperCase());
                     System.out.print("Posti disponibili: ");
                     int posti = Integer.parseInt(scanner.nextLine());
 
-                    Mezzi mezzo = new Mezzi(tipo, stato, true, posti, 0, null);
+                    Mezzi mezzo = new Mezzi(TipoMezzo.AUTOBUS,TipoPeriodicoManutenzione.IN_SERVIZIO,60,40);
                     mezziDao.save(mezzo);
                     System.out.println("Mezzo inserito con ID: " + mezzo.getId());
                 }
