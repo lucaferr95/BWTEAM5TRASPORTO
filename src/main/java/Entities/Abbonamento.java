@@ -25,10 +25,15 @@ public class Abbonamento extends TitoloDiViaggio {
     public Abbonamento() {
     }
 
-    public Abbonamento(TipoAbbonamento tipoAbbonamento, Utente utente, LocalDate dataScadenza) {
+    public Abbonamento(TipoAbbonamento tipoAbbonamento, Utente utente) {
         this.tipoAbbonamento = tipoAbbonamento;
         this.utente = utente;
-        this.dataScadenza = dataScadenza;
+        if (tipoAbbonamento == TipoAbbonamento.SETTIMANALE) {
+            this.dataScadenza = dataEmissione.plusDays(7);
+        }
+        else if (tipoAbbonamento == TipoAbbonamento.MENSILE){
+            this.dataScadenza = dataEmissione.plusDays(30);
+        }
     }
 
     public Long getId() {

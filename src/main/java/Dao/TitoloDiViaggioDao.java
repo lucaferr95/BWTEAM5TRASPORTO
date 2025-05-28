@@ -2,6 +2,7 @@ package Dao;
 import Entities.TitoloDiViaggio;
 import Entities.Biglietto;
 import Entities.Abbonamento;
+import Entities.Utente;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
@@ -48,6 +49,19 @@ public class TitoloDiViaggioDao {
             }
         }
     }
+
+    //Cerca abbonamento attivo per utente
+
+    public Abbonamento findAbbonamentoAttivoByUtente(Utente utente) {
+        TypedQuery<Abbonamento> query = em.createQuery(
+                "SELECT a FROM Abbonamento a WHERE a.utente = :utente",
+                Abbonamento.class
+        );
+        query.setParameter("utente", utente);
+
+        return query.getSingleResult();
+    }
+
 
     // Recupera tutti i biglietti
     public List<Biglietto> findAllBiglietti() {

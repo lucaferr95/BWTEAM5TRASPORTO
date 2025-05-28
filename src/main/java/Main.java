@@ -1,8 +1,8 @@
 import Dao.*;
-import Entities.Biglietto;
-import Entities.Tessera;
-import Entities.TitoloDiViaggio;
-import Entities.Utente;
+import Entities.*;
+import Enumeration.TipoAbbonamento;
+import Enumeration.TipoMezzo;
+import Enumeration.TipoPeriodicoManutenzione;
 import Enumeration.TipoUtente;
 import Exceptions.UsernameEsistenteException;
 import jakarta.persistence.EntityManager;
@@ -57,25 +57,17 @@ public class Main {
                         if (utente!=null){
                             System.out.println("Accesso eseguito, " + username);
 
+                            if (utente.getTipoUtente() == TipoUtente.PLEBEO) {
+                                menuPlebeo(utente, tesseraDao, titoloDiViaggioDao);
+                            } else {
+                                menuPatrizio(mezziDao, periodicoDao, scanner);
+                            }
+                        } else {
+                            System.out.println("Errore: credenziali non valide.\n");
+                        }
 
                             // menu
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        }
                     } catch (Exception e) {
                         System.out.println("Errore generico");
                     }
@@ -129,12 +121,12 @@ public class Main {
 
     }
 
-    public static void menuUtente(Utente utente, TesseraDao tesseraDao, TitoloDiViaggioDao titoloDao) {
+    public static void menuPlebeo(Utente utente, TesseraDao tesseraDao, TitoloDiViaggioDao titoloDao) {
         Scanner scanner = new Scanner(System.in);
         boolean continua = true;
 
         while (continua) {
-            System.out.println("\n--- MENU UTENTE (PLEBEO) ---");
+            System.out.println("\n--- MENU PLEBEO ---");
             System.out.println("1) Visualizza tessera");
             System.out.println("2) Acquista biglietto");
             System.out.println("3) Acquista abbonamento mensile");
@@ -155,18 +147,38 @@ public class Main {
                 case "2" -> {
                     TitoloDiViaggio biglietto = new Biglietto(LocalDate.now(), utente);
                     titoloDao.save(biglietto);
-                    System.out.println("Biglietto emesso con codice: " + biglietto.getId()); // siamo qui
+                    System.out.println("Biglietto emesso con codice: " + biglietto.getId()); //todo SIAMO QUI
                 }
                 case "3" -> {
-                    TitoloDiViaggio abbonamento = new TitoloDiViaggio("ABBONAMENTO_MENSILE",
-                            LocalDate.now(), LocalDate.now().plusMonths(1), utente);
-                    titoloDao.save(abbonamento);
-                    System.out.println("Abbonamento mensile attivo fino al: " + abbonamento.getDataFine());
+                    System.out.println("Che tipo di abbonamento desideri? 1:Mensile, 2:Annuale" );
+                    int sceltaAbbonamento = Integer.parseInt(scanner.nextLine());
+                    if(sceltaAbbonamento == 1){
+                        TitoloDiViaggio abbonamento = new Abbonamento(TipoAbbonamento.MENSILE, utente);
+                        titoloDao.save(abbonamento);
+                        System.out.println("Abbonamento mensile effettuato");
+                        if (abbonamento instanceof Abbonamento ) {
+                            Abbonamento abb = (Abbonamento) abbonamento;
+                            System.out.println("Abbonamento mensile attivo fino al: " + abb.getDataScadenza());
+                        }
+                    } else if (sceltaAbbonamento == 2){
+                        TitoloDiViaggio abbonamento = new Abbonamento(TipoAbbonamento.SETTIMANALE, utente);
+                        titoloDao.save(abbonamento);
+                        System.out.println("Abbonamento settimanale effettuato");
+
+                        if (abbonamento instanceof Abbonamento ) {
+                            Abbonamento abb = (Abbonamento) abbonamento;
+                            System.out.println("Abbonamento settimanale attivo fino al: " + abb.getDataScadenza());
+                        }
+                    }
+
                 }
                 case "4" -> {
-                    TitoloDiViaggio abbonamento = titoloDao.findAbbonamentoAttivoByUtente(utente.getId(), LocalDate.now());
+                    TitoloDiViaggio abbonamento = titoloDao.findAbbonamentoAttivoByUtente(utente);
                     if (abbonamento != null) {
-                        System.out.println("Abbonamento valido fino al: " + abbonamento.getDataFine());
+                        if (abbonamento instanceof Abbonamento ) {
+                            Abbonamento abb = (Abbonamento) abbonamento;
+                            System.out.println("Abbonamento settimanale attivo fino al: " + abb.getDataScadenza());
+                        }
                     } else {
                         System.out.println("Nessun abbonamento attivo trovato.");
                     }
@@ -175,5 +187,54 @@ public class Main {
                 default -> System.out.println("Scelta non valida.");
             }
         }
+
+
     }
-}
+    public static void menuPatrizio(MezziDao mezziDao, PeriodicoManutenzioneDao manutenzioneDao, Scanner scanner) {
+        boolean continua = true;
+
+        while (continua) {
+            System.out.println("\n--- MENU PATRIZIO ---");
+            System.out.println("1) Inserisci mezzo");
+            System.out.println("2) Inserisci manutenzione");
+            System.out.println("3) Inserisci numero di biglietti e abbonamenti emessi in un giorno ");
+            System.out.println("4) Cerca mezzi per tratta");
+            System.out.println("5) Calcola tempo medio effettivo per tratta da parte di un mezzo");
+            System.out.println("0) Logout");
+            System.out.print("Scelta: ");
+            String scelta = scanner.nextLine();
+
+            switch (scelta) {
+                case "1" -> {
+                    System.out.print("Tipo mezzo (TRAM/AUTOBUS): ");
+                    TipoMezzo tipo = TipoMezzo.valueOf(scanner.nextLine().toUpperCase());
+                    System.out.print("Stato attuale: ");
+                    String stato = scanner.nextLine();
+                    System.out.print("Posti disponibili: ");
+                    int posti = Integer.parseInt(scanner.nextLine());
+
+                    Mezzi mezzo = new Mezzi(tipo, stato, true, posti, 0, null);
+                    mezziDao.save(mezzo);
+                    System.out.println("Mezzo inserito con ID: " + mezzo.getId());
+                }
+                case "2" -> {
+                    System.out.print("ID mezzo per manutenzione: ");
+                    Long idMezzo = Long.parseLong(scanner.nextLine());
+                    Mezzi mezzo = mezziDao.getById(idMezzo);
+
+                    if (mezzo != null) {
+                        System.out.print("Tipo intervento (SERVIZIO/MANUTENZIONE): ");
+                        TipoPeriodicoManutenzione tipoMan = TipoPeriodicoManutenzione.valueOf(scanner.nextLine().toUpperCase());
+
+                        PeriodicoManutenzione man = new PeriodicoManutenzione(tipoMan, LocalDate.now(), LocalDate.now().plusDays(5), mezzo);
+                        manutenzioneDao.save(man);
+                        System.out.println("Manutenzione inserita con ID: " + man.getId());
+                    } else {
+                        System.out.println("Mezzo non trovato.");
+                    }
+                }
+                case "0" -> continua = false;
+                default -> System.out.println("Scelta non valida.");
+            }
+        }
+    }}
