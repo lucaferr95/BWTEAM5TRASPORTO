@@ -26,18 +26,23 @@ private Abbonamento abbonamento;
 private LocalDate validitaAnnuale;
 private boolean attiva= true;
 
+private LocalDate dataScadenza;
+
 public Tessera(){};
 
     public Tessera(LocalDate validitaAnnuale, boolean attiva) {
         this.validitaAnnuale = validitaAnnuale;
         this.attiva = attiva;
+        this.dataScadenza = validitaAnnuale.plusYears(1);
     }
 
     public int getCodiceIdentificativo() {
         return codiceIdentificativo;
     }
 
-
+    public LocalDate getDataScadenza() {
+        return dataScadenza;
+    }
 
     public LocalDate getValiditaAnnuale() {
         return validitaAnnuale;

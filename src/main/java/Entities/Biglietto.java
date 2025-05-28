@@ -5,13 +5,12 @@ import java.time.LocalDate;
 
 @Entity
 @Table( name = "biglietti")
-public class Biglietto {
+public class Biglietto extends TitoloDiViaggio{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate dataEmissione;
 
     private boolean validazione;
 
@@ -30,15 +29,13 @@ public class Biglietto {
     public Biglietto() {
     }
 
-    public Biglietto(LocalDate dataEmissione, boolean validazione, LocalDate dataValidazione,
-                      Utente utente, Mezzi mezzo) {
-        this.dataEmissione = dataEmissione;
-        this.validazione = validazione;
-        this.dataValidazione = dataValidazione;
 
+    public Biglietto(LocalDate dataEmissione, Utente utente) {
+        super(dataEmissione);
         this.utente = utente;
-        this.mezzo = mezzo;
     }
+
+
 
     public Long getId() {
         return id;
@@ -90,7 +87,6 @@ public class Biglietto {
     public String toString() {
         return "Biglietto{" +
                 "id=" + id +
-                ", dataEmissione=" + dataEmissione +
                 ", validazione=" + validazione +
                 ", dataValidazione=" + dataValidazione +
 

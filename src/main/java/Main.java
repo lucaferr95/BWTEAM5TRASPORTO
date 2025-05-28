@@ -1,4 +1,6 @@
 import Dao.*;
+import Entities.Biglietto;
+import Entities.Tessera;
 import Entities.TitoloDiViaggio;
 import Entities.Utente;
 import Enumeration.TipoUtente;
@@ -7,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -117,7 +120,60 @@ public class Main {
             }
 
 
+
         }
 
+
+
+
+
+    }
+
+    public static void menuUtente(Utente utente, TesseraDao tesseraDao, TitoloDiViaggioDao titoloDao) {
+        Scanner scanner = new Scanner(System.in);
+        boolean continua = true;
+
+        while (continua) {
+            System.out.println("\n--- MENU UTENTE (PLEBEO) ---");
+            System.out.println("1) Visualizza tessera");
+            System.out.println("2) Acquista biglietto");
+            System.out.println("3) Acquista abbonamento mensile");
+            System.out.println("4) Verifica validità abbonamento");
+            System.out.println("0) Logout");
+            System.out.print("Scelta: ");
+            String scelta1 = scanner.nextLine();
+
+            switch (scelta1) {
+                case "1" -> {
+                    Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
+                    if (tessera != null) {
+                        System.out.println("Tessera valida fino al: " + tessera.getDataScadenza());
+                    } else {
+                        System.out.println("Nessuna tessera trovata.");
+                    }
+                }
+                case "2" -> {
+                    TitoloDiViaggio biglietto = new Biglietto(LocalDate.now(), utente);
+                    titoloDao.save(biglietto);
+                    System.out.println("Biglietto emesso con codice: " + biglietto.getId()); // siamo qui
+                }
+                case "3" -> {
+                    TitoloDiViaggio abbonamento = new TitoloDiViaggio("ABBONAMENTO_MENSILE",
+                            LocalDate.now(), LocalDate.now().plusMonths(1), utente);
+                    titoloDao.save(abbonamento);
+                    System.out.println("Abbonamento mensile attivo fino al: " + abbonamento.getDataFine());
+                }
+                case "4" -> {
+                    TitoloDiViaggio abbonamento = titoloDao.findAbbonamentoAttivoByUtente(utente.getId(), LocalDate.now());
+                    if (abbonamento != null) {
+                        System.out.println("Abbonamento valido fino al: " + abbonamento.getDataFine());
+                    } else {
+                        System.out.println("Nessun abbonamento attivo trovato.");
+                    }
+                }
+                case "0" -> continua = false;
+                default -> System.out.println("Scelta non valida.");
+            }
+        }
     }
 }
