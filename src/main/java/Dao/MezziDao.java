@@ -3,6 +3,8 @@ package Dao;
 import Entities.Mezzi;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
+
 public class MezziDao {
     private EntityManager em;
 
@@ -21,6 +23,13 @@ public class MezziDao {
         }
 
     }
+    public List<Mezzi> getMezziByTrattaId(Long trattaId) {
+        return em.createQuery(
+                "SELECT m FROM Mezzi m WHERE m.tratta.id = :trattaId",
+                Mezzi.class
+        ).setParameter("trattaId", trattaId).getResultList();
+    }
+
 
     public Mezzi getById(Long id){
         return em.find(Mezzi.class, id);

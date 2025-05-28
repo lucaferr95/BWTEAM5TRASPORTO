@@ -6,6 +6,8 @@ import Entities.Utente;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public class TitoloDiViaggioDao {
@@ -27,6 +29,12 @@ public class TitoloDiViaggioDao {
             if (tx.isActive()) tx.rollback();
             e.printStackTrace();
         }
+    }
+    public long countTitoliEmessiInData(LocalDate data) {
+        return em.createQuery(
+                "SELECT COUNT(t) FROM TitoloDiViaggio t WHERE t.dataEmissione = :data",
+                Long.class
+        ).setParameter("data", data).getSingleResult();
     }
 
     // Trova per ID un abbonamento o un biglietto

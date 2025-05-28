@@ -11,6 +11,7 @@ import jakarta.persistence.Persistence;
 
 import java.time.LocalDate;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -60,7 +61,8 @@ public class Main {
                             if (utente.getTipoUtente() == TipoUtente.PLEBEO) {
                                 menuPlebeo(utente, tesseraDao, titoloDiViaggioDao);
                             } else {
-                                menuPatrizio(mezziDao, periodicoDao, scanner);
+                                menuPatrizio(mezziDao, periodicoDao, titoloDiViaggioDao, trattaDao, scanner);
+
                             }
                         } else {
                             System.out.println("Errore: credenziali non valide.\n");
@@ -190,14 +192,15 @@ public class Main {
 
 
     }
-    public static void menuPatrizio(MezziDao mezziDao, PeriodicoManutenzioneDao manutenzioneDao, Scanner scanner) {
+    public static void menuPatrizio(MezziDao mezziDao, PeriodicoManutenzioneDao manutenzioneDao,
+                                    TitoloDiViaggioDao titoloDiViaggioDao, TrattaDAO trattaDao, Scanner scanner) {
         boolean continua = true;
 
         while (continua) {
             System.out.println("\n--- MENU PATRIZIO ---");
             System.out.println("1) Inserisci mezzo");
             System.out.println("2) Inserisci manutenzione");
-            System.out.println("3) Inserisci numero di biglietti e abbonamenti emessi in un giorno ");
+            System.out.println("3) Numero biglietti e abbonamenti emessi in un giorno");
             System.out.println("4) Cerca mezzi per tratta");
             System.out.println("5) Calcola tempo medio effettivo per tratta da parte di un mezzo");
             System.out.println("0) Logout");
@@ -233,8 +236,38 @@ public class Main {
                         System.out.println("Mezzo non trovato.");
                     }
                 }
+                case "3" -> {
+                    System.out.print("Inserisci data (es: 2024-05-26): ");
+                    LocalDate data = LocalDate.parse(scanner.nextLine());
+                    long count = titoloDiViaggioDao.countTitoliEmessiInData(data);
+                    System.out.println("Titoli di viaggio emessi il " + data + ": " + count);
+                }
+                case "4" -> {
+                    System.out.print("ID della tratta: ");
+                    Long idTratta = Long.parseLong(scanner.nextLine());
+                    List<Mezzi> mezzi = mezziDao.getMezziByTrattaId(idTratta);
+                    if (mezzi.isEmpty()) {
+                        System.out.println("Nessun mezzo assegnato a questa tratta.");
+                    } else {
+                        mezzi.forEach(m -> System.out.println("Mezzo ID: " + m.getId() + ", tipo: " + m.getTipoMezzo()));
+                    }
+                }
+                case "5" -> {
+                    System.out.print("ID del mezzo: ");
+                    Long mezzoId = Long.parseLong(scanner.nextLine());
+                    System.out.print("ID della tratta: ");
+                    Long trattaId = Long.parseLong(scanner.nextLine());
+
+                    Double media = trattaDao.calcolaTempoMedioEffettivo(mezzoId, trattaId);
+                    if (media != null) {
+                        System.out.println("Tempo medio effettivo: " + media + " minuti");
+                    } else {
+                        System.out.println("Nessuna percorrenza trovata per questo mezzo su questa tratta.");
+                    }
+                }
                 case "0" -> continua = false;
                 default -> System.out.println("Scelta non valida.");
             }
         }
-    }}
+    }
+}

@@ -43,6 +43,15 @@ public class TrattaDAO {
         query.setParameter("tratta", tratta);
         return query.getResultList();
     }
+    public Double calcolaTempoMedioEffettivo(Long mezzoId, Long trattaId) {
+        return em.createQuery(
+                        "SELECT AVG(p.durataEffettiva) FROM Percorrenza p WHERE p.mezzo.id = :mezzoId AND p.tratta.id = :trattaId",
+                        Double.class
+                )
+                .setParameter("mezzoId", mezzoId)
+                .setParameter("trattaId", trattaId)
+                .getSingleResult();
+    }
 
     public double calcolaTempoMedioTratta(String nomeTratta) {
         TypedQuery<Tratta> query = em.createQuery(
