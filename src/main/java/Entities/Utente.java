@@ -26,6 +26,7 @@ private String cognome;
 
 @Enumerated (EnumType.STRING)
 private TipoUtente tipoUtente;
+@Column(unique = true) // username univoco
 private String username;
 private String password;
 public  Utente() {}

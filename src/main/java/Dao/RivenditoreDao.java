@@ -3,6 +3,8 @@ package Dao;
 import Entities.Biglietto;
 import Entities.Rivenditore;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 
 import java.time.LocalDateTime;

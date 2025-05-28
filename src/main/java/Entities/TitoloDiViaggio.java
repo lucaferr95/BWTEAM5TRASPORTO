@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "titoli_viaggi")
 public abstract class TitoloDiViaggio {
     @Column(name = "data_emissione")

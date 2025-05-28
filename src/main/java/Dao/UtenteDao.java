@@ -1,7 +1,10 @@
 package Dao;
 
 import Entities.Utente;
+import Exceptions.UsernameEsistenteException;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
@@ -15,9 +18,20 @@ public class UtenteDao {
 
     public void salvaUtente(Utente u) {
         try {
+            // Controllo username duplicato prima di iniziare la transazione
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(u) FROM Utente u WHERE u.username = :username", Long.class);
+            query.setParameter("username", u.getUsername());
+            Long count = query.getSingleResult();
+
+            if (count != null && count > 0) {
+                throw new UsernameEsistenteException("Username '" + u.getUsername() + "' già registrato.");
+            }
+
             em.getTransaction().begin();
             em.persist(u);
             em.getTransaction().commit();
+
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -43,6 +57,18 @@ public class UtenteDao {
             em.getTransaction().begin();
             em.remove(u);
             em.getTransaction().commit();
+        }
+    }
+
+    public Utente trovaUtenteConUsername(String username) {
+        try {
+            TypedQuery<Utente> query = em.createQuery(
+                    "SELECT u FROM Utente u WHERE u.username = :username", Utente.class);
+            query.setParameter("username", username);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+
+            return null;
         }
     }
 }

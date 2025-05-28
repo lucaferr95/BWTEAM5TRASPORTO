@@ -14,9 +14,8 @@ public class TrattaDAO {
 
     private EntityManager em;
 
-    public TrattaDAO() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("postgres");
-        em = emf.createEntityManager();
+    public TrattaDAO(EntityManager em) {
+        this.em = em;
     }
 
     public void save(Tratta tratta) {
