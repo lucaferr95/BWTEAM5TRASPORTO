@@ -2,10 +2,8 @@ package Dao;
 
 import Entities.Mezzi;
 import Entities.Tratta;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
-import jakarta.persistence.TypedQuery;
+import Entities.Utente;
+import jakarta.persistence.*;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -23,9 +21,13 @@ public class TrattaDAO {
         em.persist(tratta);
         em.getTransaction().commit();
     }
+    public Tratta cercaTrattaById(int id) {
+        return em.find(Tratta.class, id);
+    }
 
     public void deleteTrattaById(int id){
         Tratta tratta = em.find(Tratta.class,id);
+
 
         if (tratta!=null){
             em.getTransaction().begin();
@@ -72,5 +74,24 @@ public class TrattaDAO {
                 .orElse(0);
         return media;
     }
+    public List<Tratta> listaTratte(){
+        TypedQuery<Tratta> query = em.createQuery("SELECT t FROM Tratta t", Tratta.class);
+        return query.getResultList();
+    }
+    public void aggiornaMezzoTratta(int trattaId, Mezzi mezzo) {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Tratta tratta = em.find(Tratta.class, trattaId);
+            if (tratta != null) {
+                tratta.setMezzo(mezzo);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
 
 }

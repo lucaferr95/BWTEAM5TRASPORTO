@@ -252,6 +252,7 @@ public class Main {
             System.out.println("5) Calcola tempo medio effettivo per tratta da parte di un mezzo");
             System.out.println("6) Iscrivi un nuovo rivenditore ");
             System.out.println("7) Crea una tratta ");
+            System.out.println("8) Associa mezzo a tratta ");
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
             String scelta = scanner.nextLine();
@@ -388,21 +389,6 @@ public class Main {
                 }
 
                 case "7" -> {
-                    Mezzi veicolo = null;
-                    System.out.println("Vuoi creare un tratta per il Tram 1) o per il bus 2)?");
-                    int scelta1 = Integer.parseInt(scanner.nextLine());
-
-                    if (scelta1 == 1) {
-                        veicolo = new Mezzi(TipoMezzo.TRAM, TipoPeriodicoManutenzione.IN_SERVIZIO, 30);
-                        mezziDao.save(veicolo);
-                    } else if (scelta1 == 2) {
-                        veicolo = new Mezzi(TipoMezzo.AUTOBUS, TipoPeriodicoManutenzione.IN_SERVIZIO, 60);
-                        mezziDao.save(veicolo);
-                    } else {
-                        System.out.println("Scelta non valida.");
-                        break;
-                    }
-
                     System.out.println("Come vuoi chiamare la tratta? ");
                     String nomeTratta = scanner.nextLine();
 
@@ -421,20 +407,44 @@ public class Main {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
                         tempoPrevisto = LocalTime.parse(inputTempo, formatter);
                     } catch (DateTimeParseException e) {
-                        System.out.println("Formato orario non valido. Usa HH:mm, ad esempio 01:30");
+                        System.out.println("Formato orario non valido. Usa HH:mm, ad esempio 01:30 ");
                         System.out.println(e.getMessage());
                         return;
                     }
 
 
-                    Tratta nuovaTratta = new Tratta(veicolo, nomeTratta, zonaPartenza, tempoPrevisto, zonaArrivo);
+                    Tratta nuovaTratta = new Tratta(nomeTratta, zonaPartenza, tempoPrevisto, zonaArrivo);
                     trattaDao.save(nuovaTratta);
-                    System.out.println("Tratta creata con successo");
+                    System.out.println("Tratta creata con successo ");
+
+                }
+                case "8" -> {
+                    System.out.println("Quale tratta vuoi aggiornare?");
+                    List<Tratta> tratte = trattaDao.listaTratte();
+                    tratte.forEach(t -> System.out.println("ID: " + t.getId() + ", Nome: " + t.getNomeTratta()));
+
+                    int trattaId = Integer.parseInt(scanner.nextLine());
+
+                    System.out.println("A quale veicolo vuoi associare la tratta?");
+                    List<Mezzi> mezzi = mezziDao.listaMezzi();
+                    mezzi.forEach(m -> System.out.println("ID: " + m.getId() + ", Tipo: " + m.getTipoMezzo() + ", Stato: " + m.getStatoAttuale()));
+
+                    long mezzoId = Long.parseLong(scanner.nextLine());
+
+                    Mezzi mezzo = mezziDao.getById(mezzoId);
+                    if (mezzo == null) {
+                        System.out.println("Mezzo non trovato.");
+                        return;
+                    }
+
+                    trattaDao.aggiornaMezzoTratta(trattaId, mezzo);
+                    System.out.println("Tratta aggiornata: ora assegnata al mezzo con ID " + mezzo.getId());
                 }
 
 
+
                 case "0" -> continua = false;
-                default -> System.out.println("Scelta non valida.");
+                default -> System.out.println("Scelta non valida. ");
             }
         }
     }

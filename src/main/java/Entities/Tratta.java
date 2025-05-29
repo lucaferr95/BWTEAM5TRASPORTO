@@ -86,9 +86,9 @@ public class Tratta {
         this.capolinea = capolinea;
     }
 
-    public Tratta( Mezzi mezzo, String nomeTratta, String zonaDiPartenza, LocalTime tempoPrevisto, String capolinea) {
+    public Tratta(  String nomeTratta, String zonaDiPartenza, LocalTime tempoPrevisto, String capolinea) {
 
-        this.mezzo = mezzo;
+
 
         this.nomeTratta = nomeTratta;
         this.zonaDiPartenza = zonaDiPartenza;

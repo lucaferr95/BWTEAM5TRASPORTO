@@ -25,7 +25,8 @@ public class Mezzi {
     private int numerovidimazioni;
     @OneToMany(mappedBy = "mezzo")
     private List<Tratta> tratte;
-
+    @OneToMany(mappedBy = "mezzo")
+    private List<Biglietto> biglietti;
     @OneToMany(mappedBy = "mezzi")
     private List<PeriodicoManutenzione> serviziManutenzioni;
 

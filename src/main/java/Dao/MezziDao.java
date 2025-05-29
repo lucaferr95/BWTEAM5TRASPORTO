@@ -1,9 +1,11 @@
 package Dao;
 
 import Entities.Mezzi;
+import Entities.Tratta;
 import Enumeration.TipoPeriodicoManutenzione;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
@@ -67,5 +69,9 @@ public class MezziDao {
             if (tx.isActive()) tx.rollback();
             e.printStackTrace();
         }
+    }
+    public List<Mezzi> listaMezzi(){
+        TypedQuery<Mezzi> query = em.createQuery("SELECT m FROM Mezzi m", Mezzi.class);
+        return query.getResultList();
     }
 }
