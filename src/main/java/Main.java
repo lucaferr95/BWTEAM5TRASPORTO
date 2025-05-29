@@ -135,18 +135,25 @@ public class Main {
             System.out.println("2) Acquista biglietto");
             System.out.println("3) Acquista abbonamento mensile");
             System.out.println("4) Verifica validità abbonamento");
+            System.out.println("5) Crea tessera"); //aggiungo crea tessera
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
             String scelta1 = scanner.nextLine();
 
             switch (scelta1) {
                 case "1" -> {
-                    Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
-                    if (tessera != null) {
-                        System.out.println("Tessera valida fino al: " + tessera.getDataScadenza());
+                    try {
+                        Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
+                        if (tessera != null) {
+                            System.out.println("Hai già un tessera valida fino al: " + tessera.getDataScadenza());
+                            System.out.println(tessera);
                     } else {
                         System.out.println("Nessuna tessera trovata.");
-                    }
+
+                        }
+                    }catch (Exception e) {
+                        System.out.println("Errore durante la creazione della tessera: " + e.getMessage());}
+
                 }
                 case "2" -> {
                     TitoloDiViaggio biglietto = new Biglietto(LocalDate.now(), utente);
@@ -187,6 +194,23 @@ public class Main {
                         System.out.println("Nessun abbonamento attivo trovato.");
                     }
                 }
+                case "5" -> {
+                    try {
+                        Tessera tesseraEsistente = tesseraDao.cercaTesseraPerUtente(utente.getId());
+                        if (tesseraEsistente != null) {
+                            System.out.println("Tessera valida fino al: " + tesseraEsistente.getDataScadenza());
+                            System.out.println(tesseraEsistente);
+                        } else {
+                            Tessera nuovaTessera = new Tessera(utente);
+                            tesseraDao.salvaTessera(nuovaTessera);
+                            System.out.println("Tessera creata con successo! Valida fino al: " + nuovaTessera.getDataScadenza());
+                            System.out.println(nuovaTessera);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Errore durante la creazione della tessera: " + e.getMessage());
+                    }
+                }
+
                 case "0" -> continua = false;
                 default -> System.out.println("Scelta non valida.");
             }
@@ -215,7 +239,8 @@ public class Main {
                 case "1" -> {
                     System.out.print("Tipo mezzo (TRAM/AUTOBUS): ");
                     TipoMezzo tipo = TipoMezzo.valueOf(scanner.nextLine().toUpperCase());
-                    System.out.print("Stato attuale (IN_SERVIZIO/IN_MANUTENZIONE): ");
+                    //cambiato senza underscore
+                    System.out.print("Stato attuale (IN SERVIZIO/IN MANUTENZIONE): ");
                     TipoPeriodicoManutenzione stato = TipoPeriodicoManutenzione.valueOf(scanner.nextLine().toUpperCase());
                     System.out.print("Posti disponibili: ");
                     int posti = Integer.parseInt(scanner.nextLine());
