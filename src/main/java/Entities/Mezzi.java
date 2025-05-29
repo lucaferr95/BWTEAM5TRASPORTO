@@ -19,6 +19,7 @@ public class Mezzi {
     @Enumerated(EnumType.STRING)
     private TipoPeriodicoManutenzione statoAttuale;
 
+
     private int posti;
     @Column(name = "numero_vidimazioni")
     private int numerovidimazioni;

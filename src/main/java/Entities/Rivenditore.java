@@ -20,27 +20,18 @@ public abstract class Rivenditore {
     private String puntoVendita;
 
     @OneToMany(mappedBy = "rivenditore")
-    private List<Biglietto> bigliettiVenduti;
-
-    @OneToMany(mappedBy = "rivenditore")
-    private List<TitoloDiViaggio> titoloDiViaggio;
+    private List<TitoloDiViaggio> titoliDiViaggio;
 
     @Override
     public String toString() {
         return "Rivenditore{" +
                 "id=" + id +
                 ", puntoVendita='" + puntoVendita + '\'' +
-                ", titoloDiViaggio=" + titoloDiViaggio +
+
                 '}';
     }
 
-    public List<Biglietto> getBigliettiVenduti() {
-        return bigliettiVenduti;
-    }
 
-    public void setBigliettiVenduti(List<Biglietto> bigliettiVenduti) {
-        this.bigliettiVenduti = bigliettiVenduti;
-    }
 
     public Rivenditore(String puntoVendita) {
         this.puntoVendita = puntoVendita;
@@ -56,15 +47,6 @@ public abstract class Rivenditore {
 
     public Rivenditore() {
     }
-
-    public List<TitoloDiViaggio> getTitoloDiViaggio() {
-        return titoloDiViaggio;
-    }
-
-    public void setTitoloDiViaggio(List<TitoloDiViaggio> titoloDiViaggio) {
-        this.titoloDiViaggio = titoloDiViaggio;
-    }
-
 
     public int getId() {
         return id;

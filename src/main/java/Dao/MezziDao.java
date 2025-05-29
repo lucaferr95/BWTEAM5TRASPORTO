@@ -1,7 +1,9 @@
 package Dao;
 
 import Entities.Mezzi;
+import Enumeration.TipoPeriodicoManutenzione;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 import java.util.List;
 
@@ -51,5 +53,19 @@ public class MezziDao {
             System.out.println("Il mezzo con id " + id + " non esiste");
         }
 
+    }
+    public void aggiornaStatoMezzo(Long mezzoId, TipoPeriodicoManutenzione nuovoStato) {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Mezzi mezzo = em.find(Mezzi.class, mezzoId);
+            if (mezzo != null) {
+                mezzo.setStatoAttuale(nuovoStato);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        }
     }
 }

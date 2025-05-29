@@ -87,5 +87,18 @@ public class TitoloDiViaggioDao {
         TypedQuery<Abbonamento> query = em.createQuery("SELECT a FROM Abbonamento a", Abbonamento.class);
         return query.getResultList();
     }
+    public List<Object[]> countTitoliPerTipoRivenditore(LocalDate data) {
+        return em.createQuery(
+                        "SELECT TYPE(t.rivenditore), COUNT(t) " +
+                                "FROM TitoloDiViaggio t " +
+                                "WHERE t.dataEmissione = :data " +
+                                "GROUP BY TYPE(t.rivenditore)",
+                        Object[].class
+                )
+                .setParameter("data", data)
+                .getResultList();
+    }
+
+
 }
 

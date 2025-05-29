@@ -16,9 +16,7 @@ public class Biglietto extends TitoloDiViaggio{
 
     private LocalDate dataValidazione;
 
-    @ManyToOne
-    @JoinColumn(name = "rivenditore_id")
-    private Rivenditore rivenditore;
+
 
     @ManyToOne
     @JoinColumn(name = "utente_id")
@@ -37,15 +35,9 @@ public class Biglietto extends TitoloDiViaggio{
         this.utente = utente;
     }
 
-    @Override
-    public void setRivenditore(Rivenditore rivenditore) {
-        this.rivenditore = rivenditore;
-    }
 
-    @Override
-    public Rivenditore getRivenditore() {
-        return rivenditore;
-    }
+
+
 
     public Long getId() {
         return id;

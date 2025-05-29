@@ -33,8 +33,8 @@ public class Main {
 
 
         // AMMINISTRATORE
-        Utente patrizio = new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
-        utenteDao.salvaUtente(patrizio);
+//        Utente patrizio = new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
+//        utenteDao.salvaUtente(patrizio);
 
 
         // MENU
@@ -150,7 +150,6 @@ public class Main {
 
                 }
                 case "2" -> {
-
                     System.out.println("Dove vuoi acquistare il biglietto? 1 Macchinetta, 2 Punto Vendita");
                     int sceltaRivenditore = Integer.parseInt(scanner.nextLine());
 
@@ -164,14 +163,17 @@ public class Main {
                         return;
                     }
 
-
-                    TitoloDiViaggio biglietto = new Biglietto(LocalDate.now(), utente);
+                    // Crea il biglietto e associa rivenditore e utente
+                    Biglietto biglietto = new Biglietto(LocalDate.now(), utente);
                     biglietto.setRivenditore(rivenditoreScelto);
+
+                    // Salva il biglietto
                     titoloDao.save(biglietto);
 
                     System.out.println("Biglietto emesso con codice: " + biglietto.getId());
-
                 }
+
+
                 case "3" -> {
                     System.out.println("Che tipo di abbonamento desideri? 1:Mensile, 2:Settimanale" );
                     int sceltaAbbonamento = Integer.parseInt(scanner.nextLine());
@@ -244,7 +246,7 @@ public class Main {
         while (continua) {
             System.out.println("\n--- MENU PATRIZIO ---");
             System.out.println("1) Inserisci mezzo");
-            System.out.println("2) Inserisci manutenzione");
+            System.out.println("2) Cambia stato del mezzo");
             System.out.println("3) Numero biglietti e abbonamenti emessi in un giorno");// MACCHINETTA E TEMPO
             System.out.println("4) Cerca mezzi per tratta");
             System.out.println("5) Calcola tempo medio effettivo per tratta da parte di un mezzo");
@@ -256,42 +258,90 @@ public class Main {
 
             switch (scelta) {
                 case "1" -> {
-                    System.out.print("Tipo mezzo (TRAM/AUTOBUS): ");
-                    TipoMezzo tipo = TipoMezzo.valueOf(scanner.nextLine().toUpperCase());
-                    //cambiato senza underscore
+                    System.out.print("Tipo mezzo (1-TRAM, 2-AUTOBUS): ");
+                    int sceltaStato = Integer.parseInt(scanner.nextLine());
+
+                    TipoMezzo tipo = null;
+                    if (sceltaStato == 1) {
+                        tipo = TipoMezzo.TRAM;
+                    } else if (sceltaStato == 2) {
+                        tipo = TipoMezzo.AUTOBUS;
+                    } else {
+                        System.out.println("Scelta non valida.");
+                        return;
+                    }
                     System.out.print("Stato attuale (IN SERVIZIO/IN MANUTENZIONE): ");
-                    TipoPeriodicoManutenzione stato = TipoPeriodicoManutenzione.valueOf(scanner.nextLine().toUpperCase());
+                    int sceltaPeriodico = Integer.parseInt(scanner.nextLine());
+
+                    TipoPeriodicoManutenzione nuovoStato = null;
+                    if (sceltaPeriodico == 1) {
+                        nuovoStato = TipoPeriodicoManutenzione.IN_SERVIZIO;
+                    } else if (sceltaPeriodico == 2) {
+                        nuovoStato = TipoPeriodicoManutenzione.IN_MANUTENZIONE;
+                    } else {
+                        System.out.println("Scelta non valida.");
+                        return;
+                    }
                     System.out.print("Posti disponibili: ");
                     int posti = Integer.parseInt(scanner.nextLine());
                     System.out.print("numero vidimazioni per il viaggio: ");
                     // int vidimazioni = Integer.parseInt(scanner.nextLine());
 
-                    Mezzi mezzo = new Mezzi(tipo,stato,posti/*,vidimazioni*/);
+                    Mezzi mezzo = new Mezzi(tipo,nuovoStato,posti/*,vidimazioni*/);
                     mezziDao.save(mezzo);
                     System.out.println("Mezzo inserito con ID: " + mezzo.getId());
                 }
                 case "2" -> {
-                    System.out.print("ID mezzo per manutenzione: ");
-                    Long idMezzo = Long.parseLong(scanner.nextLine());
-                    Mezzi mezzo = mezziDao.getById(idMezzo);
+                    System.out.println("Inserisci l'ID del mezzo da aggiornare:");
+                    Long mezzoId = Long.parseLong(scanner.nextLine());
 
-                    if (mezzo != null) {
-                        System.out.print("Tipo intervento (SERVIZIO/MANUTENZIONE): ");
-                        TipoPeriodicoManutenzione tipoMan = TipoPeriodicoManutenzione.valueOf(scanner.nextLine().toUpperCase());
+                    System.out.println("Nuovo stato del mezzo? 1 - IN_SERVIZIO, 2 - IN_MANUTENZIONE");
+                    int sceltaStato = Integer.parseInt(scanner.nextLine());
 
-                        PeriodicoManutenzione man = new PeriodicoManutenzione(tipoMan, LocalDate.now(), LocalDate.now().plusDays(5), mezzo);
-                        manutenzioneDao.save(man);
-                        System.out.println("Manutenzione inserita con ID: " + man.getId());
+                    TipoPeriodicoManutenzione nuovoStato = null;
+                    if (sceltaStato == 1) {
+                        nuovoStato = TipoPeriodicoManutenzione.IN_SERVIZIO;
+                    } else if (sceltaStato == 2) {
+                        nuovoStato = TipoPeriodicoManutenzione.IN_MANUTENZIONE;
                     } else {
-                        System.out.println("Mezzo non trovato.");
+                        System.out.println("Scelta non valida.");
+                        return;
                     }
+
+                    mezziDao.aggiornaStatoMezzo(mezzoId, nuovoStato);
+                    System.out.println("Stato del mezzo aggiornato con successo. " + nuovoStato);
+
                 }
                 case "3" -> {
                     System.out.print("Inserisci data (es: 2024-05-26): ");
                     LocalDate data = LocalDate.parse(scanner.nextLine());
-                    long count = titoloDiViaggioDao.countTitoliEmessiInData(data);
-                    System.out.println("Titoli di viaggio emessi il " + data + ": " + count);
+
+                    long totale = titoloDiViaggioDao.countTitoliEmessiInData(data);
+                    System.out.println("\nTotale titoli emessi il " + data + ": " + totale);
+
+                    List<Object[]> risultati = titoloDiViaggioDao.countTitoliPerTipoRivenditore(data);
+
+                    long totaleMacchinette = 0;
+                    long totalePuntiVendita = 0;
+
+                    for (Object[] riga : risultati) {
+                        Class<?> tipo = (Class<?>) riga[0];
+                        long count = (Long) riga[1];
+
+                        if (tipo.equals(Macchinetta.class)) {
+                            totaleMacchinette = count;
+                        } else if (tipo.equals(PuntoVendita.class)) {
+                            totalePuntiVendita = count;
+                        }
+                    }
+
+                    System.out.println("\nVendite per tipo di rivenditore:");
+                    System.out.println("- Macchinette: " + totaleMacchinette + " titoli");
+                    System.out.println("- Punti Vendita: " + totalePuntiVendita + " titoli");
                 }
+
+
+
                 case "4" -> {
                     System.out.print("ID della tratta: ");
                     Long idTratta = Long.parseLong(scanner.nextLine());
