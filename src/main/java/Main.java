@@ -10,7 +10,9 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
 import java.time.LocalDate;
-import java.util.InputMismatchException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -62,8 +64,7 @@ public class Main {
                             if (utente.getTipoUtente() == TipoUtente.PLEBEO) {
                                 menuPlebeo(utente, tesseraDao, titoloDiViaggioDao);
                             } else {
-                                menuPatrizio(mezziDao, periodicoDao, titoloDiViaggioDao, trattaDao, scanner);
-
+                                menuPatrizio(mezziDao, periodicoDao, titoloDiViaggioDao, trattaDao, scanner,rivenditoreDao);
                             }
                         } else {
                             System.out.println("Errore: credenziali non valide.\n");
@@ -98,7 +99,7 @@ public class Main {
                             Utente utente = new Utente(nome, cognome, TipoUtente.PATRIZIO, username, password);
                             utenteDao.salvaUtente(utente);
                             System.out.println("Registrazione completata!");
-                        } // else
+                        }
 
                     } catch (NumberFormatException e) {
                         System.out.println("Devi inserire un numero valido per il tipo di utente.");
@@ -194,7 +195,7 @@ public class Main {
 
     }
     public static void menuPatrizio(MezziDao mezziDao, PeriodicoManutenzioneDao manutenzioneDao,
-                                    TitoloDiViaggioDao titoloDiViaggioDao, TrattaDAO trattaDao, Scanner scanner) {
+                                    TitoloDiViaggioDao titoloDiViaggioDao, TrattaDAO trattaDao, Scanner scanner, RivenditoreDao rivenditoreDao) {
         boolean continua = true;
 
         while (continua) {
@@ -204,6 +205,8 @@ public class Main {
             System.out.println("3) Numero biglietti e abbonamenti emessi in un giorno");
             System.out.println("4) Cerca mezzi per tratta");
             System.out.println("5) Calcola tempo medio effettivo per tratta da parte di un mezzo");
+            System.out.println("6) Iscrivi un nuovo rivenditore ");
+            System.out.println("7) Crea una tratta ");
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
             String scelta = scanner.nextLine();
@@ -216,8 +219,10 @@ public class Main {
                     TipoPeriodicoManutenzione stato = TipoPeriodicoManutenzione.valueOf(scanner.nextLine().toUpperCase());
                     System.out.print("Posti disponibili: ");
                     int posti = Integer.parseInt(scanner.nextLine());
+                    System.out.print("numero vidimazioni per il viaggio: ");
+                    // int vidimazioni = Integer.parseInt(scanner.nextLine());
 
-                    Mezzi mezzo = new Mezzi(TipoMezzo.AUTOBUS,TipoPeriodicoManutenzione.IN_SERVIZIO,60,40);
+                    Mezzi mezzo = new Mezzi(tipo,stato,posti/*,vidimazioni*/);
                     mezziDao.save(mezzo);
                     System.out.println("Mezzo inserito con ID: " + mezzo.getId());
                 }
@@ -266,6 +271,72 @@ public class Main {
                         System.out.println("Nessuna percorrenza trovata per questo mezzo su questa tratta.");
                     }
                 }
+                case "6" -> {
+                    System.out.print("Vuoi creare un sito fisico (1) o una macchinetta (2)? ");
+                    int scelta2 = Integer.parseInt(scanner.nextLine());
+
+                    Rivenditore rivenditore;
+
+                    if (scelta2 == 1) {
+                        System.out.print("Dove si trova questo nuovo punto vendita? ");
+                        String posizione = scanner.nextLine();
+                        rivenditore = new PuntoVendita(posizione, true);
+                        System.out.println("Punto vendita creato in: " + posizione);
+                    } else {
+                        System.out.print("Dove si trova la nuova macchinetta? ");
+                        String posizione = scanner.nextLine();
+                        rivenditore = new Macchinetta(posizione, true);
+                        System.out.println("Macchinetta creata in: " + posizione);
+                    }
+
+                    rivenditoreDao.save(rivenditore);
+                    System.out.println("Rivenditore salvato correttamente!");
+                }
+
+                case "7" -> {
+                    Mezzi veicolo = null;
+                    System.out.println("Vuoi creare un tratta per il Tram 1) o per il bus 2)?");
+                    int scelta1 = Integer.parseInt(scanner.nextLine());
+
+                    if (scelta1 == 1) {
+                        veicolo = new Mezzi(TipoMezzo.TRAM, TipoPeriodicoManutenzione.IN_SERVIZIO, 30);
+                    } else if (scelta1 == 2) {
+                        veicolo = new Mezzi(TipoMezzo.AUTOBUS, TipoPeriodicoManutenzione.IN_SERVIZIO, 60);
+                    } else {
+                        System.out.println("Scelta non valida.");
+                        break;
+                    }
+
+                    System.out.println("Come vuoi chiamare la tratta? ");
+                    String nomeTratta = scanner.nextLine();
+
+                    System.out.println("Da dove inizia questa nuova tratta? ");
+                    String zonaPartenza = scanner.nextLine();
+
+                    System.out.println("Dove finisce questa nuova tratta? ");
+                    String zonaArrivo = scanner.nextLine();
+
+
+                    System.out.println("Inserisci il tempo previsto per la tratta (HH:mm): ");
+                    String inputTempo = scanner.nextLine();
+
+                    LocalTime tempoPrevisto = null;
+                    try {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                        tempoPrevisto = LocalTime.parse(inputTempo, formatter);
+                    } catch (DateTimeParseException e) {
+                        System.out.println("Formato orario non valido. Usa HH:mm, ad esempio 01:30");
+                        return;
+                    }
+
+                    LocalTime tempoIdeale = tempoPrevisto;
+
+                    Tratta nuovaTratta = new Tratta(veicolo, nomeTratta, zonaPartenza, tempoIdeale, zonaArrivo);
+                    trattaDao.save(nuovaTratta);
+                    System.out.println("Tratta creata con successo");
+                }
+
+
                 case "0" -> continua = false;
                 default -> System.out.println("Scelta non valida.");
             }

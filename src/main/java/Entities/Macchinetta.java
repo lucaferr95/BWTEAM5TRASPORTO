@@ -10,26 +10,20 @@ import java.util.List;
 public class Macchinetta extends Rivenditore {
     private boolean inFunzione;
 
-
-    // constructor
-
-
-    public Macchinetta(boolean inFunzione) {
+    public Macchinetta(String puntoVendita, boolean inFunzione) {
+        super(puntoVendita);
         this.inFunzione = inFunzione;
     }
 
-    public Macchinetta() {
-    }
-    // to string
+    public Macchinetta() {}
 
     @Override
     public String toString() {
         return "Macchinetta{" +
                 "inFunzione=" + inFunzione +
+                ", " + super.toString() +
                 '}';
     }
-
-    //get set
 
     public boolean isInFunzione() {
         return inFunzione;

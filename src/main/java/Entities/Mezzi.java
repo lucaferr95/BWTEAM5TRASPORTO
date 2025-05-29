@@ -90,11 +90,11 @@ public class Mezzi {
         this.serviziManutenzioni = serviziManutenzioni;
     }
 
-    public Mezzi(TipoMezzo tipoMezzo, TipoPeriodicoManutenzione statoAttuale, int posti, int numerovidimazioni) {
+    public Mezzi(TipoMezzo tipoMezzo, TipoPeriodicoManutenzione statoAttuale, int posti /*,int numerovidimazioni*/) {
         this.tipoMezzo = tipoMezzo;
         this.statoAttuale = statoAttuale;
         this.posti = posti;
-        this.numerovidimazioni = numerovidimazioni;
+//        this.numerovidimazioni = numerovidimazioni;
     }
 
     @Override

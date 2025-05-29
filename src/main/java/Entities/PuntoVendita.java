@@ -10,26 +10,20 @@ import java.util.List;
 public class PuntoVendita extends Rivenditore {
     private boolean aperto;
 
-
-    // constructor
-
-
-    public PuntoVendita(boolean aperto) {
+    public PuntoVendita(String puntoVendita, boolean aperto) {
+        super(puntoVendita);
         this.aperto = aperto;
     }
 
-    public PuntoVendita() {
-    }
-    // to string
+    public PuntoVendita() {}
 
     @Override
     public String toString() {
-        return "PuntoVendita{" + super.toString() +
+        return "PuntoVendita{" +
                 "aperto=" + aperto +
+                ", " + super.toString() +
                 '}';
     }
-
-    //get set
 
     public boolean isAperto() {
         return aperto;

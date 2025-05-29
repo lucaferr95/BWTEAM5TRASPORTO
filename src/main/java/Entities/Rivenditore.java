@@ -16,22 +16,32 @@ public abstract class Rivenditore {
     @Id
     @GeneratedValue
     private int id;
+    @Column(name = "punto_vendita")
+    private String puntoVendita;
+
 
     @OneToMany(mappedBy = "rivenditore")
     private List<TitoloDiViaggio> titoloDiViaggio;
-
-
-
-
-
-
 
     @Override
     public String toString() {
         return "Rivenditore{" +
                 "id=" + id +
+                ", puntoVendita='" + puntoVendita + '\'' +
                 ", titoloDiViaggio=" + titoloDiViaggio +
                 '}';
+    }
+
+    public Rivenditore(String puntoVendita) {
+        this.puntoVendita = puntoVendita;
+    }
+
+    public String getPuntoVendita() {
+        return puntoVendita;
+    }
+
+    public void setPuntoVendita(String puntoVendita) {
+        this.puntoVendita = puntoVendita;
     }
 
     public Rivenditore() {
