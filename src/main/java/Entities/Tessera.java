@@ -13,13 +13,12 @@ public class Tessera
 @GeneratedValue
 @Column (name="codice_identificativo")
 private int codiceIdentificativo;
+
 @OneToOne
 @JoinColumn(name = "utente_id")
 private Utente utente;
-@OneToOne
 
-@JoinColumn(name = "abbonamento_id")
-
+@OneToOne(mappedBy ="tessera")
 private Abbonamento abbonamento;
 
 @Column (name="validita_annuale")
@@ -42,6 +41,10 @@ public Tessera(){};
         this.validitaAnnuale = LocalDate.now();
         this.attiva = true;
         this.dataScadenza = validitaAnnuale.plusYears(1);
+    }
+
+    public void setDataScadenza(LocalDate dataScadenza) {
+        this.dataScadenza = dataScadenza;
     }
 
     public int getCodiceIdentificativo() {
@@ -88,8 +91,8 @@ public Tessera(){};
     public String toString() {
         return "Tessera{" +
                 "codiceIdentificativo=" + codiceIdentificativo +
-                ", utente=" + utente +
-                ", abbonamento=" + abbonamento +
+                ", utenteId=" + (utente != null ? utente.getId() : "null") +
+                ", abbonamentoId=" + (abbonamento != null ? abbonamento.getId() : "null") +
                 ", validitaAnnuale=" + validitaAnnuale +
                 ", attiva=" + attiva +
                 '}';

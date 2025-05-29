@@ -7,6 +7,10 @@ import java.time.LocalDate;
 @Entity
 public class Abbonamento extends TitoloDiViaggio {
 
+@OneToOne
+@JoinColumn(name = "tessera_id")
+private Tessera tessera;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,24 +20,31 @@ public class Abbonamento extends TitoloDiViaggio {
     private TipoAbbonamento tipoAbbonamento;
 
 
-    @ManyToOne
-    @JoinColumn(name = "utente_id")
-    private Utente utente;
+
     @Column( name = "data_scadenza")
     private LocalDate dataScadenza;
 
     public Abbonamento() {
     }
 
-    public Abbonamento(TipoAbbonamento tipoAbbonamento, Utente utente) {
+    public Abbonamento(TipoAbbonamento tipoAbbonamento) {
+        this.dataEmissione = LocalDate.now();
         this.tipoAbbonamento = tipoAbbonamento;
-        this.utente = utente;
         if (tipoAbbonamento == TipoAbbonamento.SETTIMANALE) {
             this.dataScadenza = dataEmissione.plusDays(7);
         }
         else if (tipoAbbonamento == TipoAbbonamento.MENSILE){
             this.dataScadenza = dataEmissione.plusDays(30);
         }
+    }
+
+
+    public Tessera getTessera() {
+        return tessera;
+    }
+
+    public void setTessera(Tessera tessera) {
+        this.tessera = tessera;
     }
 
     public Long getId() {
@@ -48,13 +59,7 @@ public class Abbonamento extends TitoloDiViaggio {
         this.tipoAbbonamento = tipoAbbonamento;
     }
 
-    public Utente getUtente() {
-        return utente;
-    }
 
-    public void setUtente(Utente utente) {
-        this.utente = utente;
-    }
 
     public LocalDate getDataScadenza() {
         return dataScadenza;
@@ -67,12 +72,12 @@ public class Abbonamento extends TitoloDiViaggio {
     @Override
     public String toString() {
         return "Abbonamento{" +
-                "id=" + id +
-                ", tipo='" + tipoAbbonamento + '\'' +
-                ", utente=" + (utente != null ? utente.getId() : null) +
+                "tessera=" + tessera +
+                ", id=" + id +
+                ", tipoAbbonamento=" + tipoAbbonamento +
                 ", dataScadenza=" + dataScadenza +
                 ", dataEmissione=" + dataEmissione +
-                ", rivenditore=" + (rivenditore != null ? rivenditore.getId() : null) +
-                '}'+ super.toString();
+                ", rivenditore=" + rivenditore +
+                '}' +super.toString();
     }
 }

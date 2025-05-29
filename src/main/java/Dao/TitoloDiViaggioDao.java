@@ -5,6 +5,7 @@ import Entities.Abbonamento;
 import Entities.Utente;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 
 import java.time.LocalDate;
@@ -61,14 +62,18 @@ public class TitoloDiViaggioDao {
     //Cerca abbonamento attivo per utente
 
     public Abbonamento findAbbonamentoAttivoByUtente(Utente utente) {
-        TypedQuery<Abbonamento> query = em.createQuery(
-                "SELECT a FROM Abbonamento a WHERE a.utente = :utente",
-                Abbonamento.class
-        );
-        query.setParameter("utente", utente);
-
-        return query.getSingleResult();
+        try {
+            TypedQuery<Abbonamento> query = em.createQuery(
+                    "SELECT a FROM Abbonamento a WHERE a.tessera.utente = :utente",
+                    Abbonamento.class
+            );
+            query.setParameter("utente", utente);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
+
 
 
     // Recupera tutti i biglietti

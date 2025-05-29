@@ -68,6 +68,19 @@ public class RivenditoreDao {
         query.setParameter("id", rivenditoreId);
         return query.getResultList();
     }
+    public Rivenditore getRivenditoreByTipo(Class<? extends Rivenditore> tipo) {
+        TypedQuery<Rivenditore> query = em.createQuery(
+                "SELECT r FROM Rivenditore r WHERE TYPE(r) = :tipo", Rivenditore.class
+        );
+        query.setParameter("tipo", tipo);
+
+        List<Rivenditore> result = query.getResultList();
+        if (!result.isEmpty()) {
+            return result.get(0); // restituisce il primo trovato
+        } else {
+            throw new RuntimeException("Nessun rivenditore trovato per tipo: " + tipo.getSimpleName());
+        }
+    }
 
 }
 

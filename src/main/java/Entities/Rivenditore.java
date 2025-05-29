@@ -19,6 +19,8 @@ public abstract class Rivenditore {
     @Column(name = "punto_vendita")
     private String puntoVendita;
 
+    @OneToMany(mappedBy = "rivenditore")
+    private List<Biglietto> bigliettiVenduti;
 
     @OneToMany(mappedBy = "rivenditore")
     private List<TitoloDiViaggio> titoloDiViaggio;
@@ -30,6 +32,14 @@ public abstract class Rivenditore {
                 ", puntoVendita='" + puntoVendita + '\'' +
                 ", titoloDiViaggio=" + titoloDiViaggio +
                 '}';
+    }
+
+    public List<Biglietto> getBigliettiVenduti() {
+        return bigliettiVenduti;
+    }
+
+    public void setBigliettiVenduti(List<Biglietto> bigliettiVenduti) {
+        this.bigliettiVenduti = bigliettiVenduti;
     }
 
     public Rivenditore(String puntoVendita) {

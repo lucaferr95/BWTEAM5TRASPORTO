@@ -8,7 +8,7 @@ import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
-public class UtenteDao {
+public class    UtenteDao {
 
     private EntityManager em;
 

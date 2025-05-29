@@ -14,9 +14,13 @@ public class Utente {
     @OneToMany( mappedBy = "utente")
     private List<Biglietto> biglietti;
 
+    @OneToOne(mappedBy = "utente")
+    private Tessera tessera;
 @Id
 @GeneratedValue
 private int id;
+
+
 
 @Column(nullable = false)
 private String nome;
@@ -37,6 +41,14 @@ public  Utente() {}
         this.tipoUtente = tipoUtente;
         this.username = username;
         this.password = password;
+    }
+
+    public Tessera getTessera() {
+        return tessera;
+    }
+
+    public void setTessera(Tessera tessera) {
+        this.tessera = tessera;
     }
 
     public String getUsername() {
@@ -89,6 +101,6 @@ public  Utente() {}
                 "nome='" + nome + '\'' +
                 ", cognome='" + cognome + '\'' +
                 ", tipoUtente=" + tipoUtente +
-                '}';
+                '}' ;
     }
 }

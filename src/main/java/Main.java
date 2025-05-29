@@ -23,7 +23,6 @@ public class Main {
         // DAO
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("Postgres");
         EntityManager em = emf.createEntityManager();
-
         RivenditoreDao rivenditoreDao = new RivenditoreDao(em);
         MezziDao mezziDao = new MezziDao(em);
         PeriodicoManutenzioneDao periodicoDao = new PeriodicoManutenzioneDao(em);
@@ -32,8 +31,13 @@ public class Main {
         TrattaDAO trattaDao = new TrattaDAO(em);
         UtenteDao utenteDao = new UtenteDao(em);
 
-        // MENU
 
+        // AMMINISTRATORE
+        Utente patrizio = new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
+        utenteDao.salvaUtente(patrizio);
+
+
+        // MENU
         int scelta = -1;
         while (scelta != 0) {
             try {
@@ -62,7 +66,7 @@ public class Main {
                             System.out.println("Accesso eseguito, " + username);
 
                             if (utente.getTipoUtente() == TipoUtente.PLEBEO) {
-                                menuPlebeo(utente, tesseraDao, titoloDiViaggioDao);
+                                menuPlebeo(utente, tesseraDao, titoloDiViaggioDao, rivenditoreDao);
                             } else {
                                 menuPatrizio(mezziDao, periodicoDao, titoloDiViaggioDao, trattaDao, scanner,rivenditoreDao);
                             }
@@ -73,7 +77,8 @@ public class Main {
                             // menu
 
                     } catch (Exception e) {
-                        System.out.println("Errore generico");
+                        System.out.println(e.getMessage());
+
                     }
 
                 }
@@ -89,20 +94,9 @@ public class Main {
                         String username = scanner.nextLine();
                         System.out.println("Inserisci la password");
                         String password = scanner.nextLine();
-                        System.out.println("Sei un plebeo(1) o un patrizio(2)?");
-                        int tipoUtente = Integer.parseInt(scanner.nextLine());
-                        if(tipoUtente == 1){
-                            Utente utente = new Utente(nome, cognome, TipoUtente.PLEBEO, username, password);
-                            utenteDao.salvaUtente(utente);
-                            System.out.println("Registrazione completata!");
-                        } else if (tipoUtente == 2){
-                            Utente utente = new Utente(nome, cognome, TipoUtente.PATRIZIO, username, password);
-                            utenteDao.salvaUtente(utente);
-                            System.out.println("Registrazione completata!");
-                        }
-
-                    } catch (NumberFormatException e) {
-                        System.out.println("Devi inserire un numero valido per il tipo di utente.");
+                        Utente utente = new Utente(nome, cognome, TipoUtente.PLEBEO, username, password);
+                        utenteDao.salvaUtente(utente);
+                        System.out.println("Registrazione completata!");
                     } catch (UsernameEsistenteException e) {
                         System.out.println("Errore: " + e.getMessage());
                     } catch (Exception e) {
@@ -125,7 +119,7 @@ public class Main {
 
     }
 
-    public static void menuPlebeo(Utente utente, TesseraDao tesseraDao, TitoloDiViaggioDao titoloDao) {
+    public static void menuPlebeo(Utente utente, TesseraDao tesseraDao, TitoloDiViaggioDao titoloDao, RivenditoreDao rivenditoreDao) {
         Scanner scanner = new Scanner(System.in);
         boolean continua = true;
 
@@ -156,29 +150,54 @@ public class Main {
 
                 }
                 case "2" -> {
+
+                    System.out.println("Dove vuoi acquistare il biglietto? 1 Macchinetta, 2 Punto Vendita");
+                    int sceltaRivenditore = Integer.parseInt(scanner.nextLine());
+
+                    Rivenditore rivenditoreScelto = null;
+                    if (sceltaRivenditore == 1) {
+                        rivenditoreScelto = rivenditoreDao.getRivenditoreByTipo(Macchinetta.class);
+                    } else if (sceltaRivenditore == 2) {
+                        rivenditoreScelto = rivenditoreDao.getRivenditoreByTipo(PuntoVendita.class);
+                    } else {
+                        System.out.println("Scelta non valida.");
+                        return;
+                    }
+
+
                     TitoloDiViaggio biglietto = new Biglietto(LocalDate.now(), utente);
+                    biglietto.setRivenditore(rivenditoreScelto);
                     titoloDao.save(biglietto);
-                    System.out.println("Biglietto emesso con codice: " + biglietto.getId()); //todo SIAMO QUI
+
+                    System.out.println("Biglietto emesso con codice: " + biglietto.getId());
+
                 }
                 case "3" -> {
-                    System.out.println("Che tipo di abbonamento desideri? 1:Mensile, 2:Annuale" );
+                    System.out.println("Che tipo di abbonamento desideri? 1:Mensile, 2:Settimanale" );
                     int sceltaAbbonamento = Integer.parseInt(scanner.nextLine());
+                    Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
+                    if (tessera == null) {
+                        System.out.println("Devi prima creare una tessera prima di acquistare un abbonamento.");
+                        //Break;
+                    }
                     if(sceltaAbbonamento == 1){
-                        TitoloDiViaggio abbonamento = new Abbonamento(TipoAbbonamento.MENSILE, utente);
+                        TitoloDiViaggio abbonamento = new Abbonamento(TipoAbbonamento.MENSILE);
+                        ((Abbonamento) abbonamento).setTessera(tessera);
                         titoloDao.save(abbonamento);
                         System.out.println("Abbonamento mensile effettuato");
                         if (abbonamento instanceof Abbonamento ) {
                             Abbonamento abb = (Abbonamento) abbonamento;
-                            System.out.println("Abbonamento mensile attivo fino al: " + abb.getDataScadenza());
+                            System.out.println("Abbonamento attivo fino al: " + abb.getDataScadenza());
                         }
                     } else if (sceltaAbbonamento == 2){
-                        TitoloDiViaggio abbonamento = new Abbonamento(TipoAbbonamento.SETTIMANALE, utente);
+                        TitoloDiViaggio abbonamento = new Abbonamento(TipoAbbonamento.SETTIMANALE);
+                        ((Abbonamento) abbonamento).setTessera(tessera);
                         titoloDao.save(abbonamento);
                         System.out.println("Abbonamento settimanale effettuato");
 
                         if (abbonamento instanceof Abbonamento ) {
                             Abbonamento abb = (Abbonamento) abbonamento;
-                            System.out.println("Abbonamento settimanale attivo fino al: " + abb.getDataScadenza());
+                            System.out.println("Abbonamento attivo fino al: " + abb.getDataScadenza());
                         }
                     }
 
@@ -188,7 +207,7 @@ public class Main {
                     if (abbonamento != null) {
                         if (abbonamento instanceof Abbonamento ) {
                             Abbonamento abb = (Abbonamento) abbonamento;
-                            System.out.println("Abbonamento settimanale attivo fino al: " + abb.getDataScadenza());
+                            System.out.println("Abbonamento attivo fino al: " + abb.getDataScadenza());
                         }
                     } else {
                         System.out.println("Nessun abbonamento attivo trovato.");
@@ -226,7 +245,7 @@ public class Main {
             System.out.println("\n--- MENU PATRIZIO ---");
             System.out.println("1) Inserisci mezzo");
             System.out.println("2) Inserisci manutenzione");
-            System.out.println("3) Numero biglietti e abbonamenti emessi in un giorno");
+            System.out.println("3) Numero biglietti e abbonamenti emessi in un giorno");// MACCHINETTA E TEMPO
             System.out.println("4) Cerca mezzi per tratta");
             System.out.println("5) Calcola tempo medio effettivo per tratta da parte di un mezzo");
             System.out.println("6) Iscrivi un nuovo rivenditore ");
@@ -325,8 +344,10 @@ public class Main {
 
                     if (scelta1 == 1) {
                         veicolo = new Mezzi(TipoMezzo.TRAM, TipoPeriodicoManutenzione.IN_SERVIZIO, 30);
+                        mezziDao.save(veicolo);
                     } else if (scelta1 == 2) {
                         veicolo = new Mezzi(TipoMezzo.AUTOBUS, TipoPeriodicoManutenzione.IN_SERVIZIO, 60);
+                        mezziDao.save(veicolo);
                     } else {
                         System.out.println("Scelta non valida.");
                         break;
@@ -351,12 +372,12 @@ public class Main {
                         tempoPrevisto = LocalTime.parse(inputTempo, formatter);
                     } catch (DateTimeParseException e) {
                         System.out.println("Formato orario non valido. Usa HH:mm, ad esempio 01:30");
+                        System.out.println(e.getMessage());
                         return;
                     }
 
-                    LocalTime tempoIdeale = tempoPrevisto;
 
-                    Tratta nuovaTratta = new Tratta(veicolo, nomeTratta, zonaPartenza, tempoIdeale, zonaArrivo);
+                    Tratta nuovaTratta = new Tratta(veicolo, nomeTratta, zonaPartenza, tempoPrevisto, zonaArrivo);
                     trattaDao.save(nuovaTratta);
                     System.out.println("Tratta creata con successo");
                 }
