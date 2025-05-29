@@ -36,6 +36,14 @@ public Tessera(){};
         this.dataScadenza = validitaAnnuale.plusYears(1);
     }
 
+    //aggiungo un costruttore
+    public Tessera(Utente utente) {
+        this.utente = utente;
+        this.validitaAnnuale = LocalDate.now();
+        this.attiva = true;
+        this.dataScadenza = validitaAnnuale.plusYears(1);
+    }
+
     public int getCodiceIdentificativo() {
         return codiceIdentificativo;
     }

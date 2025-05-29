@@ -32,12 +32,24 @@ import java.util.List;
             return em.find(Tessera.class, codiceIdentificativo);
         }
 
+//        public Tessera cercaTesseraPerUtente(int idUtente) {
+//            return em.createQuery(
+//                            "SELECT t FROM Tessera t WHERE t.utente.id = :idUtente", Tessera.class)
+//                    .setParameter("idUtente", idUtente)
+//                    .getSingleResult();
+//        }
+
+        //cambio il metodo per gestire le eccezioni
         public Tessera cercaTesseraPerUtente(int idUtente) {
-            return em.createQuery(
+            List<Tessera> risultati = em.createQuery(
                             "SELECT t FROM Tessera t WHERE t.utente.id = :idUtente", Tessera.class)
                     .setParameter("idUtente", idUtente)
-                    .getSingleResult();
+                    .getResultList();
+
+            return risultati.isEmpty() ? null : risultati.get(0);
         }
+
+
 
         public List<Tessera> trovaTessere() {
             return em.createQuery("SELECT t FROM Tessera t", Tessera.class).getResultList();
