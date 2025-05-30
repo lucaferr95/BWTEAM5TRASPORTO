@@ -27,12 +27,7 @@ public class MezziDao {
         }
 
     }
-    public List<Mezzi> getMezziByTrattaId(Long trattaId) {
-        return em.createQuery(
-                "SELECT m FROM Mezzi m WHERE m.tratta.id = :trattaId",
-                Mezzi.class
-        ).setParameter("trattaId", trattaId).getResultList();
-    }
+
 
 
     public Mezzi getById(Long id){
