@@ -33,8 +33,8 @@ public class Main {
 
 
         // AMMINISTRATORE
-//        Utente patrizio = new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
-//        utenteDao.salvaUtente(patrizio);
+      // Utente patrizio = new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
+     // utenteDao.salvaUtente(patrizio);
 
 
         // MENU
@@ -129,7 +129,8 @@ public class Main {
             System.out.println("2) Acquista biglietto");
             System.out.println("3) Acquista abbonamento mensile");
             System.out.println("4) Verifica validità abbonamento");
-            System.out.println("5) Crea tessera"); //aggiungo crea tessera
+            System.out.println("5) Crea tessera "); //aggiungo crea tessera
+            System.out.println("6) Prendi mezzo ");
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
             String scelta1 = scanner.nextLine();
@@ -230,6 +231,9 @@ public class Main {
                     } catch (Exception e) {
                         System.out.println("Errore durante la creazione della tessera: " + e.getMessage());
                     }
+                }
+                case "6" -> {
+
                 }
 
                 case "0" -> continua = false;
@@ -398,7 +402,7 @@ public class Main {
                     System.out.println("Dove finisce questa nuova tratta? ");
                     String zonaArrivo = scanner.nextLine();
 
-
+                    // Aggiunto il prompt per l'orario
                     System.out.println("Inserisci il tempo previsto per la tratta (HH:mm): ");
                     String inputTempo = scanner.nextLine();
 

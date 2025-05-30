@@ -28,6 +28,8 @@ public abstract class TitoloDiViaggio {
     public TitoloDiViaggio() {
     }
 
+    public abstract boolean isValido(); //non so se serve ma credo di si
+
     public TitoloDiViaggio(LocalDate dataEmissione ) {
         this.dataEmissione = dataEmissione;
 

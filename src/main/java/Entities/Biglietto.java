@@ -36,6 +36,10 @@ public class Biglietto extends TitoloDiViaggio{
     }
 
 
+    @Override // il bilgietto è sempre valido fino a validazione
+    public boolean isValido() {
+        return !validazione;
+    }
 
 
 

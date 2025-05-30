@@ -21,6 +21,7 @@ private Tessera tessera;
 
 
 
+
     @Column( name = "data_scadenza")
     private LocalDate dataScadenza;
 
@@ -36,6 +37,12 @@ private Tessera tessera;
         else if (tipoAbbonamento == TipoAbbonamento.MENSILE){
             this.dataScadenza = dataEmissione.plusDays(30);
         }
+    }
+
+    @Override // qua facciamo l'override del metodo per vedere se l'abbonamento è valido o no per salire sul bus
+    public boolean isValido() {
+        return dataScadenza != null &&
+                (dataScadenza.isAfter(LocalDate.now()) || dataScadenza.isEqual(LocalDate.now()));
     }
 
 
