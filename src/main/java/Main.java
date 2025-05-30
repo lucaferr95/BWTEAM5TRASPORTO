@@ -33,8 +33,8 @@ public class Main {
 
 
         // AMMINISTRATORE
-      // Utente patrizio = new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
-     // utenteDao.salvaUtente(patrizio);
+//       Utente patrizio = new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
+//      utenteDao.salvaUtente(patrizio);
 
 
         // MENU
@@ -350,7 +350,7 @@ public class Main {
                 case "4" -> {
                     System.out.print("ID della tratta: ");
                     Long idTratta = Long.parseLong(scanner.nextLine());
-                    List<Mezzi> mezzi = mezziDao.getMezziByTrattaId(idTratta);
+                    List<Mezzi> mezzi = trattaDao.getMezziByTrattaId(idTratta);
                     if (mezzi.isEmpty()) {
                         System.out.println("Nessun mezzo assegnato a questa tratta.");
                     } else {

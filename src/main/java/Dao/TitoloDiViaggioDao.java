@@ -59,19 +59,31 @@ public class TitoloDiViaggioDao {
         }
     }
 
-    //Cerca abbonamento attivo per utente
+//    //Cerca abbonamento attivo per utente
+//
+//    public Abbonamento findAbbonamentoAttivoByUtente(Utente utente) {
+//        try {
+//            TypedQuery<Abbonamento> query = em.createQuery(
+//                    "SELECT a FROM Abbonamento a WHERE a.tessera.utente = :utente",
+//                    Abbonamento.class
+//            );
+//            query.setParameter("utente", utente);
+//            return query.getSingleResult();
+//        } catch (NoResultException e) {
+//            return null;
+//        }
+//    }
+
 
     public Abbonamento findAbbonamentoAttivoByUtente(Utente utente) {
-        try {
-            TypedQuery<Abbonamento> query = em.createQuery(
-                    "SELECT a FROM Abbonamento a WHERE a.tessera.utente = :utente",
-                    Abbonamento.class
-            );
-            query.setParameter("utente", utente);
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+        List<Abbonamento> risultati = em.createQuery(
+                        "SELECT a FROM Abbonamento a WHERE a.tessera.utente = :utente AND a.dataScadenza >= :oggi",
+                        Abbonamento.class
+                ).setParameter("utente", utente)
+                .setParameter("oggi", LocalDate.now())
+                .getResultList();
+
+        return risultati.isEmpty() ? null : risultati.get(0); // Prendi il più recente
     }
 
 
