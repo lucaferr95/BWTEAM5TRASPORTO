@@ -33,9 +33,9 @@ public class Main {
         UtenteDao utenteDao = new UtenteDao(em);
 
 
-//         AMMINISTRATORE
-       // Utente patrizio= new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
-        //utenteDao.salvaUtente(patrizio);
+        // AMMINISTRATORE
+        // Utente patrizio= new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
+        // utenteDao.salvaUtente(patrizio);
 
 
         // MENU
@@ -372,7 +372,7 @@ public class Main {
             System.out.println("5) Aggiorna lo stato del mezzo(Manutenzione/Servizio)");
             System.out.println("6) Cerca mezzi per una determinata tratta");
             System.out.println("7) Visualizza Numero biglietti e abbonamenti emessi in un giorno");
-            System.out.println("8) Cerca biglietti vidimati per mezzo  ");
+            System.out.println("8) Cerca biglietti vidimati per mezzo ");
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
             String scelta = scanner.nextLine();
