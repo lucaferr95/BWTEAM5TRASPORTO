@@ -1,5 +1,6 @@
 package Dao;
 import Entities.*;
+import Enumeration.TipoAbbonamento;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
@@ -57,20 +58,17 @@ public class TitoloDiViaggioDao {
         }
     }
 
-//    //Cerca abbonamento attivo per utente
-//
-//    public Abbonamento findAbbonamentoAttivoByUtente(Utente utente) {
-//        try {
-//            TypedQuery<Abbonamento> query = em.createQuery(
-//                    "SELECT a FROM Abbonamento a WHERE a.tessera.utente = :utente",
-//                    Abbonamento.class
-//            );
-//            query.setParameter("utente", utente);
-//            return query.getSingleResult();
-//        } catch (NoResultException e) {
-//            return null;
-//        }
-//    }
+    public Abbonamento findAbbonamentoAttivoByTipo(Utente utente, TipoAbbonamento tipo) {
+        List<Abbonamento> risultati = em.createQuery(
+                        "SELECT a FROM Abbonamento a WHERE a.tessera.utente = :utente AND a.tipoAbbonamento = :tipo AND a.dataScadenza >= :oggi",
+                        Abbonamento.class
+                ).setParameter("utente", utente)
+                .setParameter("tipo", tipo)
+                .setParameter("oggi", LocalDate.now())
+                .getResultList();
+
+        return risultati.isEmpty() ? null : risultati.get(0);
+    }
 
 
     public Abbonamento findAbbonamentoAttivoByUtente(Utente utente) {

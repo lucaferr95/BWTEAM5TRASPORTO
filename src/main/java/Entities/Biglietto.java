@@ -13,7 +13,6 @@ public class Biglietto extends TitoloDiViaggio{
 
 
     private boolean validazione;
-
     private LocalDate dataValidazione;
 
 

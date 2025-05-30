@@ -42,6 +42,13 @@ public class Main {
         int scelta = -1;
         while (scelta != 0) {
             try {
+
+                System.out.println("""
+                                        ╔════════════════════╗
+                                            💻 TEAM 5 💻      
+                                          💪Giulia's Slaves🐢
+                                        ╚════════════════════╝
+                                        """);
                 System.out.println("Welcome user!");
                 System.out.println("1 - Esegui il Login");
                 System.out.println("2 - Registrazione");
@@ -55,33 +62,37 @@ public class Main {
                 continue;
             }
             switch (scelta){
-                case 1->{
-                    try {
-                        System.out.println("Inserisci l'username: ");
-                        String username = scanner.nextLine();
-                        System.out.println("Inserisci la password");
-                        String password = scanner.nextLine();
+                case 1 -> {
+                    boolean loginRiuscito = false;
 
-                        Utente utente = utenteDao.trovaUtenteConUsername(username); //utente estratto
-                        if (utente!=null){
-                            System.out.println("Accesso eseguito, " + username);
+                    while (!loginRiuscito) {
+                        try {
 
-                            if (utente.getTipoUtente() == TipoUtente.PLEBEO) {
-                                menuPlebeo(utente, tesseraDao, titoloDiViaggioDao, rivenditoreDao, trattaDao, mezziDao);
+
+                            System.out.println("Inserisci l'username: ");
+                            String username = scanner.nextLine();
+                            System.out.println("Inserisci la password");
+                            String password = scanner.nextLine();
+
+                            Utente utente = utenteDao.trovaUtenteConUsername(username);
+
+                            if (utente != null && utente.getPassword().equals(password)) {
+                                System.out.println("Accesso eseguito, " + username);
+                                loginRiuscito = true;
+
+                                if (utente.getTipoUtente() == TipoUtente.PLEBEO) {
+                                    menuPlebeo(utente, tesseraDao, titoloDiViaggioDao, rivenditoreDao, trattaDao, mezziDao);
+                                } else {
+                                    menuPatrizio(mezziDao, periodicoDao, titoloDiViaggioDao, trattaDao, scanner, rivenditoreDao);
+                                }
                             } else {
-                                menuPatrizio(mezziDao, periodicoDao, titoloDiViaggioDao, trattaDao, scanner,rivenditoreDao);
+                                System.out.println("Username o password errati. Riprova.\n");
                             }
-                        } else {
-                            System.out.println("Errore: credenziali non valide.\n");
+
+                        } catch (Exception e) {
+                            System.out.println("Errore durante il login: " + e.getMessage());
                         }
-
-                            // menu
-
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-
                     }
-
                 }
 
                 case 2 -> {
@@ -125,13 +136,14 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         boolean continua = true;
 
+
         while (continua) {
             System.out.println("\n--- MENU PLEBEO ---");
-            System.out.println("1) Visualizza tessera");
-            System.out.println("2) Acquista biglietto");
+            System.out.println("1) Acquista biglietto");
+            System.out.println("2) Acquista una tessera");
             System.out.println("3) Acquista abbonamento");
-            System.out.println("4) Verifica validità abbonamento");
-            System.out.println("5) Crea tessera"); //aggiungo crea tessera
+            System.out.println("4) Visualizza tessera  ");
+            System.out.println("5) Verifica validità abbonamento");
             System.out.println("6) Percorri una tratta");
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
@@ -139,20 +151,7 @@ public class Main {
 
             switch (scelta1) {
                 case "1" -> {
-                    try {
-                        Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
-                        if (tessera != null) {
-                            System.out.println("Hai già un tessera valida fino al: " + tessera.getDataScadenza());
-                            System.out.println(tessera);
-                    } else {
-                        System.out.println("Nessuna tessera trovata.");
 
-                        }
-                    }catch (Exception e) {
-                        System.out.println("Errore durante la creazione della tessera: " + e.getMessage());}
-
-                }
-                case "2" -> {
                     System.out.println("Dove vuoi acquistare il biglietto? 1: Macchinetta, 2: Punto Vendita");
                     int sceltaRivenditore = Integer.parseInt(scanner.nextLine());
 
@@ -199,65 +198,9 @@ public class Main {
                     titoloDao.save(biglietto); // Salva dopo aver fatto tutti i set
 
                     System.out.println("Biglietto emesso con codice: " + biglietto.getId());
+
                 }
-
-
-
-                case "3" -> {
-                    System.out.println("Che tipo di abbonamento desideri? 1:Mensile, 2:Settimanale");
-                    int sceltaAbbonamento = Integer.parseInt(scanner.nextLine());
-
-                    // Verifica tessera
-                    Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
-                    if (tessera == null) {
-                        System.out.println("Devi prima creare una tessera prima di acquistare un abbonamento.");
-                        break;
-                    }
-
-                    // Scelta del rivenditore
-                    System.out.println("Dove vuoi acquistare l'abbonamento? 1: Macchinetta, 2: Punto Vendita");
-                    int sceltaRivenditore = Integer.parseInt(scanner.nextLine());
-
-                    Rivenditore rivenditoreScelto = null;
-                    if (sceltaRivenditore == 1) {
-                        rivenditoreScelto = rivenditoreDao.getRivenditoreByTipo(Macchinetta.class);
-                    } else if (sceltaRivenditore == 2) {
-                        rivenditoreScelto = rivenditoreDao.getRivenditoreByTipo(PuntoVendita.class);
-                    } else {
-                        System.out.println("Scelta rivenditore non valida.");
-                    }
-
-                    // Creazione abbonamento
-                    Abbonamento abbonamento;
-                    if (sceltaAbbonamento == 1) {
-                        abbonamento = new Abbonamento(TipoAbbonamento.MENSILE);
-                    } else if (sceltaAbbonamento == 2) {
-                        abbonamento = new Abbonamento(TipoAbbonamento.SETTIMANALE);
-                    } else {
-                        System.out.println("Scelta tipo abbonamento non valida.");
-                        break;
-                    }
-
-                    abbonamento.setTessera(tessera);
-                    abbonamento.setRivenditore(rivenditoreScelto);
-                    titoloDao.save(abbonamento);
-
-                    System.out.println("Abbonamento " + abbonamento.getTipoAbbonamento().name().toLowerCase()
-                            + " effettuato con scadenza: " + abbonamento.getDataScadenza());
-                }
-
-                case "4" -> {
-                    TitoloDiViaggio abbonamento = titoloDao.findAbbonamentoAttivoByUtente(utente);
-                    if (abbonamento != null) {
-                        if (abbonamento instanceof Abbonamento ) {
-                            Abbonamento abb = (Abbonamento) abbonamento;
-                            System.out.println("Abbonamento attivo fino al: " + abb.getDataScadenza());
-                        }
-                    } else {
-                        System.out.println("Nessun abbonamento attivo trovato.");
-                    }
-                }
-                case "5" -> {
+                case "2" -> {
                     try {
                         Tessera tesseraEsistente = tesseraDao.cercaTesseraPerUtente(utente.getId());
                         if (tesseraEsistente != null) {
@@ -271,6 +214,87 @@ public class Main {
                         }
                     } catch (Exception e) {
                         System.out.println("Errore durante la creazione della tessera: " + e.getMessage());
+                    }
+                }
+
+                case "3" -> {
+                    System.out.println("Che tipo di abbonamento desideri? 1:Mensile, 2:Settimanale");
+                    int sceltaAbbonamento = Integer.parseInt(scanner.nextLine());
+
+                    TipoAbbonamento tipoScelto = null;
+                    if (sceltaAbbonamento == 1) {
+                        tipoScelto = TipoAbbonamento.MENSILE;
+                    } else if (sceltaAbbonamento == 2) {
+                        tipoScelto = TipoAbbonamento.SETTIMANALE;
+                    } else {
+                        System.out.println("Scelta tipo abbonamento non valida.");
+                        break;
+                    }
+
+                    // Verifica tessera
+                    Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
+                    if (tessera == null) {
+                        System.out.println("Devi prima creare una tessera prima di acquistare un abbonamento.");
+                        break;
+                    }
+
+                    // Verifica esistenza abbonamento attivo dello stesso tipo
+                    Abbonamento abbonamentoEsistente = titoloDao.findAbbonamentoAttivoByTipo(utente, tipoScelto);
+                    if (abbonamentoEsistente != null) {
+                        System.out.println("Abbonamento " + tipoScelto.name().toLowerCase()
+                                + " giÃ  attivo fino al: " + abbonamentoEsistente.getDataScadenza());
+                        break;
+                    }
+
+                    // Scelta rivenditore
+                    System.out.println("Dove vuoi acquistare l'abbonamento? 1: Macchinetta, 2: Punto Vendita");
+                    int sceltaRivenditore = Integer.parseInt(scanner.nextLine());
+
+                    Rivenditore rivenditoreScelto = null;
+                    if (sceltaRivenditore == 1) {
+                        rivenditoreScelto = rivenditoreDao.getRivenditoreByTipo(Macchinetta.class);
+                    } else if (sceltaRivenditore == 2) {
+                        rivenditoreScelto = rivenditoreDao.getRivenditoreByTipo(PuntoVendita.class);
+                    } else {
+                        System.out.println("Scelta rivenditore non valida.");
+                        break;
+                    }
+
+                    // Crea e salva l'abbonamento
+                    Abbonamento nuovoAbbonamento = new Abbonamento(tipoScelto);
+                    nuovoAbbonamento.setTessera(tessera);
+                    nuovoAbbonamento.setRivenditore(rivenditoreScelto);
+                    titoloDao.save(nuovoAbbonamento);
+
+                    System.out.println("Abbonamento " + tipoScelto.name().toLowerCase()
+                            + " effettuato con scadenza: " + nuovoAbbonamento.getDataScadenza());
+                }
+
+                case "4" -> {
+
+
+                    //visualizza tessera
+                    try {
+                        Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
+                        if (tessera != null) {
+                            System.out.println("Hai già un tessera valida fino al: " + tessera.getDataScadenza());
+                            System.out.println(tessera);
+                    } else {
+                        System.out.println("Nessuna tessera trovata.");
+
+                        }
+                    }catch (Exception e) {
+                        System.out.println("Errore durante la creazione della tessera: " + e.getMessage());}
+                }
+                case "5" -> {
+                    TitoloDiViaggio abbonamento = titoloDao.findAbbonamentoAttivoByUtente(utente);
+                    if (abbonamento != null) {
+                        if (abbonamento instanceof Abbonamento ) {
+                            Abbonamento abb = (Abbonamento) abbonamento;
+                            System.out.println("Abbonamento attivo fino al: " + abb.getDataScadenza());
+                        }
+                    } else {
+                        System.out.println("Nessun abbonamento attivo trovato.");
                     }
                 }
                 case "6" -> {
