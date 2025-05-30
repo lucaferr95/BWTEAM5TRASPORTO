@@ -32,10 +32,10 @@ public class Main {
         TrattaDAO trattaDao = new TrattaDAO(em);
         UtenteDao utenteDao = new UtenteDao(em);
 
-//
-////         AMMINISTRATORE
-//        Utente patrizio= new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
-//        utenteDao.salvaUtente(patrizio);
+
+//         AMMINISTRATORE
+        Utente patrizio= new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
+        utenteDao.salvaUtente(patrizio);
 
 
         // MENU
@@ -195,7 +195,7 @@ public class Main {
                     }
                     utente.getBiglietti().add(biglietto);
 
-                    titoloDao.save(biglietto); // Salva dopo aver fatto tutti i set
+                    titoloDao.save(biglietto);
 
                     System.out.println("Biglietto emesso con codice: " + biglietto.getId());
 
@@ -278,7 +278,7 @@ public class Main {
                         Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
                         if (tessera != null) {
                             System.out.println("Hai già un tessera valida fino al: " + tessera.getDataScadenza());
-                            System.out.println(tessera);
+                            System.out.println(tessera); // cambia tostring
                     } else {
                         System.out.println("Nessuna tessera trovata.");
 
@@ -342,7 +342,7 @@ public class Main {
                         mezzo.setNumerovidimazioni(mezzo.getNumerovidimazioni() + 1);
                         mezziDao.update(mezzo);
                         titoloDao.update(bigliettoValido); // Assicurati che questo metodo esista nel DAO
-                        System.out.println("Accesso consentito con biglietto. Hai preso il mezzo ID: " + mezzo.getId() + ". Buon viaggio, viaggiatore.");
+                        System.out.println("Accesso consentito con biglietto. Hai preso il mezzo ID: " + mezzo.getId() + ". Buon viaggio, plebeo!");
                     } else {
                         System.out.println("Non hai titoli di viaggio validi. Acquista un biglietto o un abbonamento, capra.");
                     }
@@ -359,110 +359,25 @@ public class Main {
                                     TitoloDiViaggioDao titoloDiViaggioDao, TrattaDAO trattaDao, Scanner scanner, RivenditoreDao rivenditoreDao) {
         boolean continua = true;
 
+
+
+
         while (continua) {
             System.out.println("\n--- MENU PATRIZIO ---");
-            System.out.println("1) Inserisci mezzo");
-            System.out.println("2) Cambia stato del mezzo");
-            System.out.println("3) Numero biglietti e abbonamenti emessi in un giorno");// MACCHINETTA E TEMPO
-            System.out.println("4) Cerca mezzi per tratta");
-            System.out.println("5) Cerca biglietti vidimati per mezzo");
-            System.out.println("6) Iscrivi un nuovo rivenditore ");
-            System.out.println("7) Crea una tratta ");
-            System.out.println("8) Associa mezzo a tratta ");
+            System.out.println("1) Aggiungi un nuovo rivenditore");
+            System.out.println("2) Aggiungi un nuovo mezzo");
+            System.out.println("3) Crea una nuova tratta");
+            System.out.println("4) Associa un mezzo a una tratta");
+            System.out.println("5) Aggiorna lo stato del mezzo(Manutenzione/Servizio)");
+            System.out.println("6) Cerca mezzi per una determinata tratta");
+            System.out.println("7) Visualizza Numero biglietti e abbonamenti emessi in un giorno");
+            System.out.println("8) Cerca biglietti vidimati per mezzo  ");
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
             String scelta = scanner.nextLine();
 
             switch (scelta) {
                 case "1" -> {
-                    System.out.print("Tipo mezzo (1-TRAM, 2-AUTOBUS): ");
-                    int sceltaStato = Integer.parseInt(scanner.nextLine());
-
-                    TipoMezzo tipo = null;
-                    if (sceltaStato == 1) {
-                        tipo = TipoMezzo.TRAM;
-                    } else if (sceltaStato == 2) {
-                        tipo = TipoMezzo.AUTOBUS;
-                    } else {
-                        System.out.println("Scelta non valida.");
-                        return;
-                    }
-                    System.out.print("Stato attuale (1-IN SERVIZIO 2-IN MANUTENZIONE): ");
-                    int sceltaPeriodico = Integer.parseInt(scanner.nextLine());
-
-                    TipoPeriodicoManutenzione nuovoStato = null;
-                    if (sceltaPeriodico == 1) {
-                        nuovoStato = TipoPeriodicoManutenzione.IN_SERVIZIO;
-                    } else if (sceltaPeriodico == 2) {
-                        nuovoStato = TipoPeriodicoManutenzione.IN_MANUTENZIONE;
-                    } else {
-                        System.out.println("Scelta non valida.");
-                        return;
-                    }
-                    System.out.print("Posti disponibili: ");
-                    int posti = Integer.parseInt(scanner.nextLine());
-
-                    Mezzi mezzo = new Mezzi(tipo,nuovoStato,posti/*,vidimazioni*/);
-                    mezziDao.save(mezzo);
-                    System.out.println("Mezzo inserito con ID: " + mezzo.getId());
-                }
-                case "2" -> {
-                    System.out.println("Inserisci l'ID del mezzo da aggiornare:");
-                    Long mezzoId = Long.parseLong(scanner.nextLine());
-
-                    System.out.println("Nuovo stato del mezzo? 1 - IN_SERVIZIO, 2 - IN_MANUTENZIONE");
-                    int sceltaStato = Integer.parseInt(scanner.nextLine());
-
-                    TipoPeriodicoManutenzione nuovoStato = null;
-                    if (sceltaStato == 1) {
-                        nuovoStato = TipoPeriodicoManutenzione.IN_SERVIZIO;
-                    } else if (sceltaStato == 2) {
-                        nuovoStato = TipoPeriodicoManutenzione.IN_MANUTENZIONE;
-                    } else {
-                        System.out.println("Scelta non valida.");
-                        return;
-                    }
-
-                    mezziDao.aggiornaStatoMezzo(mezzoId, nuovoStato);
-                    System.out.println("Stato del mezzo aggiornato con successo. " + nuovoStato);
-
-                }
-                case "3" -> {
-                    System.out.print("Inserisci data (es: 2024-05-26): ");
-                    LocalDate data = LocalDate.parse(scanner.nextLine());
-
-                    long totale = titoloDiViaggioDao.countTitoliEmessiInData(data);
-                    System.out.println("\nTotale titoli emessi il " + data + ": " + totale);
-
-                    List<String> riepilogo = titoloDiViaggioDao.riepilogoTitoliPerRivenditoreETipo(data);
-                    System.out.println("\nDettaglio per tipo di rivenditore e titolo:");
-                    riepilogo.forEach(System.out::println);
-                }
-
-
-
-
-                case "4" -> {
-                    System.out.print("ID della tratta: ");
-                    Long idTratta = Long.parseLong(scanner.nextLine());
-                    List<Mezzi> mezzi = trattaDao.getMezziByTrattaId(idTratta);
-                    if (mezzi.isEmpty()) {
-                        System.out.println("Nessun mezzo assegnato a questa tratta.");
-                    } else {
-                        mezzi.forEach(m -> System.out.println("Mezzo ID: " + m.getId() + ", tipo: " + m.getTipoMezzo()));
-                    }
-                }
-                case "5" -> {
-                    System.out.println("Di quale mezzo vuoi controllare le vidimazioni? ");
-                    List<Mezzi> mezzi = mezziDao.listaMezzi();
-                    mezzi.forEach(m -> System.out.println("ID: " + m.getId() + ", Tipo: " + m.getTipoMezzo()
-                            + ", Stato: " + m.getStatoAttuale()));
-
-                    long mezzoId = Long.parseLong(scanner.nextLine());
-                    System.out.println(mezziDao.countBigliettiVidimatiPerMezzo(mezzoId));
-
-                }
-                case "6" -> {
                     System.out.print("Vuoi creare un sito fisico (1) o una macchinetta (2)? ");
                     int scelta2 = Integer.parseInt(scanner.nextLine());
 
@@ -507,10 +422,46 @@ public class Main {
 
                     rivenditoreDao.save(rivenditore);
                     System.out.println("Rivenditore salvato correttamente!");
+
+
                 }
+                case "2" -> {
+
+                    System.out.print("Tipo mezzo (1-TRAM, 2-AUTOBUS): ");
+                    int sceltaStato = Integer.parseInt(scanner.nextLine());
+
+                    TipoMezzo tipo = null;
+                    if (sceltaStato == 1) {
+                        tipo = TipoMezzo.TRAM;
+                    } else if (sceltaStato == 2) {
+                        tipo = TipoMezzo.AUTOBUS;
+                    } else {
+                        System.out.println("Scelta non valida.");
+                        return;
+                    }
+                    System.out.print("Stato attuale (1-IN SERVIZIO 2-IN MANUTENZIONE): ");
+                    int sceltaPeriodico = Integer.parseInt(scanner.nextLine());
+
+                    TipoPeriodicoManutenzione nuovoStato = null;
+                    if (sceltaPeriodico == 1) {
+                        nuovoStato = TipoPeriodicoManutenzione.IN_SERVIZIO;
+                    } else if (sceltaPeriodico == 2) {
+                        nuovoStato = TipoPeriodicoManutenzione.IN_MANUTENZIONE;
+                    } else {
+                        System.out.println("Scelta non valida.");
+                        return;
+                    }
+                    System.out.print("Posti disponibili: ");
+                    int posti = Integer.parseInt(scanner.nextLine());
+
+                    Mezzi mezzo = new Mezzi(tipo,nuovoStato,posti/*,vidimazioni*/);
+                    mezziDao.save(mezzo);
+                    System.out.println("Mezzo inserito con ID: " + mezzo.getId());
 
 
-                case "7" -> {
+                }
+                case "3" -> {
+
                     System.out.println("Come vuoi chiamare la tratta? ");
                     String nomeTratta = scanner.nextLine();
 
@@ -540,7 +491,11 @@ public class Main {
                     System.out.println("Tratta creata con successo ");
 
                 }
-                case "8" -> {
+
+
+
+
+                case "4" -> {
                     System.out.println("Quale tratta vuoi aggiornare?");
                     List<Tratta> tratte = trattaDao.listaTratte();
                     tratte.forEach(t -> System.out.println("ID: " + t.getId() + ", Nome: " + t.getNomeTratta()));
@@ -562,6 +517,64 @@ public class Main {
 
                     trattaDao.aggiornaMezzoTratta(trattaId, mezzo);
                     System.out.println("Tratta aggiornata: ora assegnata al mezzo con ID " + mezzo.getId());
+
+                }
+                case "5" -> {
+                    System.out.println("Inserisci l'ID del mezzo da aggiornare:");
+                    //lista di mezzi
+                    Long mezzoId = Long.parseLong(scanner.nextLine());
+
+                    System.out.println("Nuovo stato del mezzo? 1 - IN_SERVIZIO, 2 - IN_MANUTENZIONE");
+                    int sceltaStato = Integer.parseInt(scanner.nextLine());
+
+                    TipoPeriodicoManutenzione nuovoStato = null;
+                    if (sceltaStato == 1) {
+                        nuovoStato = TipoPeriodicoManutenzione.IN_SERVIZIO;
+                    } else if (sceltaStato == 2) {
+                        nuovoStato = TipoPeriodicoManutenzione.IN_MANUTENZIONE;
+                    } else {
+                       System.out.println("Scelta non valida.");
+                       return;
+                    }
+                    // aggiungi print al veicolo cambiato
+                    mezziDao.aggiornaStatoMezzo(mezzoId, nuovoStato);
+                }
+                case "6" -> {
+
+                    System.out.print("ID della tratta: ");
+                    //print tratte
+                    Long idTratta = Long.parseLong(scanner.nextLine());
+
+                    List<Mezzi> mezzi = trattaDao.getMezziByTrattaId(idTratta);
+                    if (mezzi.isEmpty()) {
+                        System.out.println("Nessun mezzo assegnato a questa tratta.");
+                    } else {
+                        mezzi.forEach(m -> System.out.println("Mezzo ID: " + m.getId() + ", tipo: " + m.getTipoMezzo()));
+                    }
+                }
+
+
+
+                case "7" -> {
+                    System.out.print("Inserisci data (es: 2024-05-26): ");
+                    LocalDate data = LocalDate.parse(scanner.nextLine());
+
+                    long totale = titoloDiViaggioDao.countTitoliEmessiInData(data);
+                    System.out.println("\nTotale titoli emessi il " + data + ": " + totale);
+
+                    List<String> riepilogo = titoloDiViaggioDao.riepilogoTitoliPerRivenditoreETipo(data);
+                    System.out.println("\nDettaglio per tipo di rivenditore e titolo:");
+                    riepilogo.forEach(System.out::println);
+
+                }
+                case "8" -> {
+                    System.out.println("Di quale mezzo vuoi controllare le vidimazioni? ");
+                    List<Mezzi> mezzi = mezziDao.listaMezzi();
+                    mezzi.forEach(m -> System.out.println("ID: " + m.getId() + ", Tipo: " + m.getTipoMezzo()
+                            + ", Stato: " + m.getStatoAttuale()));
+
+                    long mezzoId = Long.parseLong(scanner.nextLine());
+                    System.out.println("Numero di biglietti vidimati per il mezzo selezionato: " + mezziDao.countBigliettiVidimatiPerMezzo(mezzoId));
                 }
 
 
