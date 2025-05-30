@@ -8,6 +8,8 @@ import java.util.List;
 @Entity
 @DiscriminatorValue("PuntoVendita")
 public class PuntoVendita extends Rivenditore {
+    private String nome;
+    private String posizione;
     private boolean aperto;
 
     public PuntoVendita(String puntoVendita, boolean aperto) {
@@ -16,6 +18,14 @@ public class PuntoVendita extends Rivenditore {
     }
 
     public PuntoVendita() {}
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
     @Override
     public String toString() {
@@ -31,5 +41,12 @@ public class PuntoVendita extends Rivenditore {
 
     public void setAperto(boolean aperto) {
         this.aperto = aperto;
+    }
+
+    public String getPosizione() {
+        return posizione;
+    }
+
+    public void setPosizione(String posizione) {
     }
 }

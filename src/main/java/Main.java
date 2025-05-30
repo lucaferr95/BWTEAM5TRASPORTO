@@ -31,10 +31,10 @@ public class Main {
         TrattaDAO trattaDao = new TrattaDAO(em);
         UtenteDao utenteDao = new UtenteDao(em);
 
-
-        // AMMINISTRATORE
-//       Utente patrizio = new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
-//      utenteDao.salvaUtente(patrizio);
+//
+////         AMMINISTRATORE
+//        Utente patrizio= new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
+//        utenteDao.salvaUtente(patrizio);
 
 
         // MENU
@@ -127,10 +127,9 @@ public class Main {
             System.out.println("\n--- MENU PLEBEO ---");
             System.out.println("1) Visualizza tessera");
             System.out.println("2) Acquista biglietto");
-            System.out.println("3) Acquista abbonamento mensile");
+            System.out.println("3) Acquista abbonamento");
             System.out.println("4) Verifica validità abbonamento");
-            System.out.println("5) Crea tessera "); //aggiungo crea tessera
-            System.out.println("6) Prendi mezzo ");
+            System.out.println("5) Crea tessera"); //aggiungo crea tessera
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
             String scelta1 = scanner.nextLine();
@@ -151,7 +150,61 @@ public class Main {
 
                 }
                 case "2" -> {
-                    System.out.println("Dove vuoi acquistare il biglietto? 1 Macchinetta, 2 Punto Vendita");
+                    System.out.println("Dove vuoi acquistare il biglietto? 1: Macchinetta, 2: Punto Vendita");
+                    int sceltaRivenditore = Integer.parseInt(scanner.nextLine());
+
+                    Rivenditore rivenditoreScelto = null;
+
+                    if (sceltaRivenditore == 1) {
+                        rivenditoreScelto = rivenditoreDao.getRivenditoreByTipo(Macchinetta.class);
+                    } else if (sceltaRivenditore == 2) {
+                        List<PuntoVendita> puntiVendita = rivenditoreDao.getTuttiIPuntiVendita();
+
+                        if (puntiVendita.isEmpty()) {
+                            System.out.println("Nessun punto vendita disponibile.");
+
+                        }
+
+                        System.out.println("Punti vendita disponibili:");
+                        for (PuntoVendita pv : puntiVendita) {
+                            System.out.println("- ID: " + pv.getId() + " | Nome: " + pv.getNome());
+                        }
+
+                        System.out.print("Inserisci l'ID del punto vendita: ");
+                        long idScelto = Long.parseLong(scanner.nextLine());
+                        rivenditoreScelto = rivenditoreDao.getById((int) idScelto);
+
+                        if (!(rivenditoreScelto instanceof PuntoVendita)) {
+                            System.out.println("ID non corrisponde a un punto vendita.");
+
+                        }
+                    } else {
+                        System.out.println("Scelta non valida.");
+                        return;
+                    }
+
+                    Biglietto biglietto = new Biglietto(LocalDate.now(), utente);
+                    biglietto.setRivenditore(rivenditoreScelto);
+                    titoloDao.save(biglietto);
+
+                    System.out.println("Biglietto emesso con codice: " + biglietto.getId());
+                }
+
+
+
+                case "3" -> {
+                    System.out.println("Che tipo di abbonamento desideri? 1:Mensile, 2:Settimanale");
+                    int sceltaAbbonamento = Integer.parseInt(scanner.nextLine());
+
+                    // Verifica tessera
+                    Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
+                    if (tessera == null) {
+                        System.out.println("Devi prima creare una tessera prima di acquistare un abbonamento.");
+                        break;
+                    }
+
+                    // Scelta del rivenditore
+                    System.out.println("Dove vuoi acquistare l'abbonamento? 1: Macchinetta, 2: Punto Vendita");
                     int sceltaRivenditore = Integer.parseInt(scanner.nextLine());
 
                     Rivenditore rivenditoreScelto = null;
@@ -160,51 +213,28 @@ public class Main {
                     } else if (sceltaRivenditore == 2) {
                         rivenditoreScelto = rivenditoreDao.getRivenditoreByTipo(PuntoVendita.class);
                     } else {
-                        System.out.println("Scelta non valida.");
-                        return;
+                        System.out.println("Scelta rivenditore non valida.");
                     }
 
-                    // Crea il biglietto e associa rivenditore e utente
-                    Biglietto biglietto = new Biglietto(LocalDate.now(), utente);
-                    biglietto.setRivenditore(rivenditoreScelto);
+                    // Creazione abbonamento
+                    Abbonamento abbonamento;
+                    if (sceltaAbbonamento == 1) {
+                        abbonamento = new Abbonamento(TipoAbbonamento.MENSILE);
+                    } else if (sceltaAbbonamento == 2) {
+                        abbonamento = new Abbonamento(TipoAbbonamento.SETTIMANALE);
+                    } else {
+                        System.out.println("Scelta tipo abbonamento non valida.");
+                        break;
+                    }
 
-                    // Salva il biglietto
-                    titoloDao.save(biglietto);
+                    abbonamento.setTessera(tessera);
+                    abbonamento.setRivenditore(rivenditoreScelto);
+                    titoloDao.save(abbonamento);
 
-                    System.out.println("Biglietto emesso con codice: " + biglietto.getId());
+                    System.out.println("Abbonamento " + abbonamento.getTipoAbbonamento().name().toLowerCase()
+                            + " effettuato con scadenza: " + abbonamento.getDataScadenza());
                 }
 
-
-                case "3" -> {
-                    System.out.println("Che tipo di abbonamento desideri? 1:Mensile, 2:Settimanale" );
-                    int sceltaAbbonamento = Integer.parseInt(scanner.nextLine());
-                    Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
-                    if (tessera == null) {
-                        System.out.println("Devi prima creare una tessera prima di acquistare un abbonamento.");
-                        //Break;
-                    }
-                    if(sceltaAbbonamento == 1){
-                        TitoloDiViaggio abbonamento = new Abbonamento(TipoAbbonamento.MENSILE);
-                        ((Abbonamento) abbonamento).setTessera(tessera);
-                        titoloDao.save(abbonamento);
-                        System.out.println("Abbonamento mensile effettuato");
-                        if (abbonamento instanceof Abbonamento ) {
-                            Abbonamento abb = (Abbonamento) abbonamento;
-                            System.out.println("Abbonamento attivo fino al: " + abb.getDataScadenza());
-                        }
-                    } else if (sceltaAbbonamento == 2){
-                        TitoloDiViaggio abbonamento = new Abbonamento(TipoAbbonamento.SETTIMANALE);
-                        ((Abbonamento) abbonamento).setTessera(tessera);
-                        titoloDao.save(abbonamento);
-                        System.out.println("Abbonamento settimanale effettuato");
-
-                        if (abbonamento instanceof Abbonamento ) {
-                            Abbonamento abb = (Abbonamento) abbonamento;
-                            System.out.println("Abbonamento attivo fino al: " + abb.getDataScadenza());
-                        }
-                    }
-
-                }
                 case "4" -> {
                     TitoloDiViaggio abbonamento = titoloDao.findAbbonamentoAttivoByUtente(utente);
                     if (abbonamento != null) {
@@ -231,9 +261,6 @@ public class Main {
                     } catch (Exception e) {
                         System.out.println("Errore durante la creazione della tessera: " + e.getMessage());
                     }
-                }
-                case "6" -> {
-
                 }
 
                 case "0" -> continua = false;
@@ -324,33 +351,18 @@ public class Main {
                     long totale = titoloDiViaggioDao.countTitoliEmessiInData(data);
                     System.out.println("\nTotale titoli emessi il " + data + ": " + totale);
 
-                    List<Object[]> risultati = titoloDiViaggioDao.countTitoliPerTipoRivenditore(data);
-
-                    long totaleMacchinette = 0;
-                    long totalePuntiVendita = 0;
-
-                    for (Object[] riga : risultati) {
-                        Class<?> tipo = (Class<?>) riga[0];
-                        long count = (Long) riga[1];
-
-                        if (tipo.equals(Macchinetta.class)) {
-                            totaleMacchinette = count;
-                        } else if (tipo.equals(PuntoVendita.class)) {
-                            totalePuntiVendita = count;
-                        }
-                    }
-
-                    System.out.println("\nVendite per tipo di rivenditore:");
-                    System.out.println("- Macchinette: " + totaleMacchinette + " titoli");
-                    System.out.println("- Punti Vendita: " + totalePuntiVendita + " titoli");
+                    List<String> riepilogo = titoloDiViaggioDao.riepilogoTitoliPerRivenditoreETipo(data);
+                    System.out.println("\nDettaglio per tipo di rivenditore e titolo:");
+                    riepilogo.forEach(System.out::println);
                 }
+
 
 
 
                 case "4" -> {
                     System.out.print("ID della tratta: ");
                     Long idTratta = Long.parseLong(scanner.nextLine());
-                    List<Mezzi> mezzi = trattaDao.getMezziByTrattaId(idTratta);
+                    List<Mezzi> mezzi = mezziDao.getMezziByTrattaId(idTratta);
                     if (mezzi.isEmpty()) {
                         System.out.println("Nessun mezzo assegnato a questa tratta.");
                     } else {
@@ -377,20 +389,46 @@ public class Main {
                     Rivenditore rivenditore;
 
                     if (scelta2 == 1) {
+                        //chiediamo il nome del punto vendita al Patrizio
+
+                        System.out.print("Come vuoi chiamare il punto vendita? ");
+                        String nome = scanner.nextLine();
+
+                        //chiediamo anche la posizione
+
                         System.out.print("Dove si trova questo nuovo punto vendita? ");
                         String posizione = scanner.nextLine();
-                        rivenditore = new PuntoVendita(posizione, true);
-                        System.out.println("Punto vendita creato in: " + posizione);
+
+                        // Creazione punto vendita e settaggio nome e posizione
+                        PuntoVendita puntoVendita = new PuntoVendita();
+                        puntoVendita.setNome(nome);
+                        puntoVendita.setPosizione(posizione);
+
+
+                        rivenditore = puntoVendita;
+
+                        System.out.println("Punto vendita creato col nome " + nome + " in " + posizione);
+
+                    } else if (scelta2 == 2) {
+
+
+
+                        Macchinetta macchinetta = new Macchinetta();
+
+
+
+                        rivenditore = macchinetta;
+
+                        System.out.println("Nuova macchinetta creata") ;
                     } else {
-                        System.out.print("Dove si trova la nuova macchinetta? ");
-                        String posizione = scanner.nextLine();
-                        rivenditore = new Macchinetta(posizione, true);
-                        System.out.println("Macchinetta creata in: " + posizione);
+                        System.out.println("Scelta non valida.");
+                        return;
                     }
 
                     rivenditoreDao.save(rivenditore);
                     System.out.println("Rivenditore salvato correttamente!");
                 }
+
 
                 case "7" -> {
                     System.out.println("Come vuoi chiamare la tratta? ");
@@ -402,7 +440,7 @@ public class Main {
                     System.out.println("Dove finisce questa nuova tratta? ");
                     String zonaArrivo = scanner.nextLine();
 
-                    // Aggiunto il prompt per l'orario
+
                     System.out.println("Inserisci il tempo previsto per la tratta (HH:mm): ");
                     String inputTempo = scanner.nextLine();
 
