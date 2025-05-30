@@ -89,12 +89,12 @@ public Tessera(){};
 
     @Override
     public String toString() {
-        return "Tessera{" +
-                "codiceIdentificativo=" + codiceIdentificativo +
-                ", utenteId=" + (utente != null ? utente.getId() : "null") +
-                ", abbonamentoId=" + (abbonamento != null ? abbonamento.getId() : "null") +
-                ", validitaAnnuale=" + validitaAnnuale +
-                ", attiva=" + attiva +
-                '}';
+        return "Tessera: [" +
+                "codiceIdentificativo: " + codiceIdentificativo +
+                ", utenteId: " + (utente != null ? utente.getId() : "null") +
+                ", abbonamentoId: " + (abbonamento != null ? abbonamento.getId() : "null") +
+                ", validitaAnnuale: " + validitaAnnuale +
+                ", stato=" + (attiva ? "attiva" : "non attiva") +
+                ']';
     }
 }

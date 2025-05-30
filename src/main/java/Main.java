@@ -34,8 +34,8 @@ public class Main {
 
 
 //         AMMINISTRATORE
-        Utente patrizio= new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
-        utenteDao.salvaUtente(patrizio);
+       // Utente patrizio= new Utente("Gino", "Parmigino",TipoUtente.PATRIZIO,"Topogigio","ciao");
+        //utenteDao.salvaUtente(patrizio);
 
 
         // MENU
@@ -239,10 +239,11 @@ public class Main {
                     }
 
                     // Verifica esistenza abbonamento attivo dello stesso tipo
-                    Abbonamento abbonamentoEsistente = titoloDao.findAbbonamentoAttivoByTipo(utente, tipoScelto);
-                    if (abbonamentoEsistente != null) {
-                        System.out.println("Abbonamento " + tipoScelto.name().toLowerCase()
-                                + " giÃ  attivo fino al: " + abbonamentoEsistente.getDataScadenza());
+                    Abbonamento abbonamentoAttivo = titoloDao.findAbbonamentoAttivoByUtente(utente);
+                    if (abbonamentoAttivo != null) {
+                        System.out.println("Hai già un abbonamento attivo ("
+                                + abbonamentoAttivo.getTipoAbbonamento().name().toLowerCase()
+                                + ") fino al: " + abbonamentoAttivo.getDataScadenza());
                         break;
                     }
 
@@ -278,7 +279,7 @@ public class Main {
                         Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
                         if (tessera != null) {
                             System.out.println("Hai già un tessera valida fino al: " + tessera.getDataScadenza());
-                            System.out.println(tessera); // cambia tostring
+                            System.out.println(tessera);
                     } else {
                         System.out.println("Nessuna tessera trovata.");
 
@@ -341,7 +342,7 @@ public class Main {
                         bigliettoValido.setValidazione(true);
                         mezzo.setNumerovidimazioni(mezzo.getNumerovidimazioni() + 1);
                         mezziDao.update(mezzo);
-                        titoloDao.update(bigliettoValido); // Assicurati che questo metodo esista nel DAO
+                        titoloDao.update(bigliettoValido);
                         System.out.println("Accesso consentito con biglietto. Hai preso il mezzo ID: " + mezzo.getId() + ". Buon viaggio, plebeo!");
                     } else {
                         System.out.println("Non hai titoli di viaggio validi. Acquista un biglietto o un abbonamento, capra.");
@@ -521,7 +522,9 @@ public class Main {
                 }
                 case "5" -> {
                     System.out.println("Inserisci l'ID del mezzo da aggiornare:");
-                    //lista di mezzi
+                    List<Mezzi> mezzi = mezziDao.listaMezzi();
+                    mezzi.forEach(m -> System.out.println("ID: " + m.getId() + ", Tipo: " + m.getTipoMezzo()
+                            + ", Stato: " + m.getStatoAttuale()));
                     Long mezzoId = Long.parseLong(scanner.nextLine());
 
                     System.out.println("Nuovo stato del mezzo? 1 - IN_SERVIZIO, 2 - IN_MANUTENZIONE");
@@ -536,20 +539,22 @@ public class Main {
                        System.out.println("Scelta non valida.");
                        return;
                     }
-                    // aggiungi print al veicolo cambiato
+
                     mezziDao.aggiornaStatoMezzo(mezzoId, nuovoStato);
+                    System.out.println("Nuovo stato cambaito in: " + nuovoStato);
                 }
                 case "6" -> {
 
-                    System.out.print("ID della tratta: ");
-                    //print tratte
+                    System.out.print("ID della tratta che vuoi visualizzare: \n");
+                    List<Tratta> tratte = trattaDao.listaTratte();
+                    tratte.forEach(t -> System.out.println("ID: " + t.getId() + ", Nome: " + t.getNomeTratta()));
                     Long idTratta = Long.parseLong(scanner.nextLine());
 
                     List<Mezzi> mezzi = trattaDao.getMezziByTrattaId(idTratta);
                     if (mezzi.isEmpty()) {
                         System.out.println("Nessun mezzo assegnato a questa tratta.");
                     } else {
-                        mezzi.forEach(m -> System.out.println("Mezzo ID: " + m.getId() + ", tipo: " + m.getTipoMezzo()));
+                        mezzi.forEach(m -> System.out.println("Mezzo assegnato alla tratta: " + m.getId() + ", tipo: " + m.getTipoMezzo()));
                     }
                 }
 
