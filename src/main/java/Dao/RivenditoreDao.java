@@ -1,6 +1,7 @@
 package Dao;
 
 import Entities.Biglietto;
+import Entities.PuntoVendita;
 import Entities.Rivenditore;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -80,6 +81,9 @@ public class RivenditoreDao {
         } else {
             throw new RuntimeException("Nessun rivenditore trovato per tipo: " + tipo.getSimpleName());
         }
+    }
+    public List<PuntoVendita> getTuttiIPuntiVendita() {
+        return em.createQuery("SELECT p FROM PuntoVendita p", PuntoVendita.class).getResultList();
     }
 
 }
