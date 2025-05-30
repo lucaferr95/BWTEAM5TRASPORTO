@@ -95,6 +95,14 @@ public  Utente() {}
         return id;
     }
 
+    public List<Biglietto> getBiglietti() {
+        return biglietti;
+    }
+
+    public void setBiglietti(List<Biglietto> biglietti) {
+        this.biglietti = biglietti;
+    }
+
     @Override
     public String toString() {
         return "Utente{" +

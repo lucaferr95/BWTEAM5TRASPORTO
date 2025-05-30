@@ -69,4 +69,28 @@ public class MezziDao {
         TypedQuery<Mezzi> query = em.createQuery("SELECT m FROM Mezzi m", Mezzi.class);
         return query.getResultList();
     }
+
+    public void update(Mezzi mezzo) {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(mezzo); // aggiorna lo stato del mezzo nel database
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+    public long countBigliettiVidimatiPerMezzo(Long mezzoId) {
+        String jpql = """
+        SELECT COUNT(b)
+        FROM Biglietto b
+        WHERE b.mezzo.id = :mezzoId AND b.validazione = true
+    """;
+
+        return em.createQuery(jpql, Long.class)
+                .setParameter("mezzoId", mezzoId)
+                .getSingleResult();
+    }
+
 }

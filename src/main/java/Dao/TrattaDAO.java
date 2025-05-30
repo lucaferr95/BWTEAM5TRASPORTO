@@ -21,7 +21,7 @@ public class TrattaDAO {
         em.persist(tratta);
         em.getTransaction().commit();
     }
-    public Tratta cercaTrattaById(int id) {
+    public Tratta cercaTrattaById(long id) {
         return em.find(Tratta.class, id);
     }
 
@@ -45,35 +45,15 @@ public class TrattaDAO {
         query.setParameter("tratta", tratta);
         return query.getResultList();
     }
-    public Double calcolaTempoMedioEffettivo(Long mezzoId, Long trattaId) {
-        return em.createQuery(
-                        "SELECT AVG(p.durataEffettiva) FROM Percorrenza p WHERE p.mezzo.id = :mezzoId AND p.tratta.id = :trattaId",
-                        Double.class
-                )
-                .setParameter("mezzoId", mezzoId)
-                .setParameter("trattaId", trattaId)
-                .getSingleResult();
-    }
-
-    public double calcolaTempoMedioTratta(String nomeTratta) {
-        TypedQuery<Tratta> query = em.createQuery(
-                "SELECT t FROM tratta t WHERE t.tratta = :tratta", Tratta.class);
-        query.setParameter("tratta", nomeTratta);
-
-        List<Tratta> tratte = query.getResultList();
-
-        if (tratte.isEmpty()) {
-            System.out.println("Nessuna tratta trovata con nome: " + nomeTratta);
-            return 0;
-        }
-
-        double media = tratte.stream()
-                .filter(t -> t.getTempoEffettivo() != null && t.getTempoPrevisto() != null)
-                .mapToLong(t -> ChronoUnit.HOURS.between(t.getTempoPrevisto(), t.getTempoEffettivo()))
-                .average()
-                .orElse(0);
-        return media;
-    }
+//    public Double calcolaTempoMedioEffettivo(Long mezzoId, Long trattaId) {
+//        return em.createQuery(
+//                        "SELECT AVG(p.durataEffettiva) FROM Percorrenza p WHERE p.mezzo.id = :mezzoId AND p.tratta.id = :trattaId",
+//                        Double.class
+//                )
+//                .setParameter("mezzoId", mezzoId)
+//                .setParameter("trattaId", trattaId)
+//                .getSingleResult();
+//    }
     public List<Tratta> listaTratte(){
         TypedQuery<Tratta> query = em.createQuery("SELECT t FROM Tratta t", Tratta.class);
         return query.getResultList();

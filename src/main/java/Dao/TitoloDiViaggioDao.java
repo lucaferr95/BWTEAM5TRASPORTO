@@ -135,7 +135,19 @@ public class TitoloDiViaggioDao {
 
 
 
+    //------Metodo per aggiornare un oggetto gia esistente
 
+    public void update(TitoloDiViaggio titolo) {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(titolo); // aggiorna o "attacca" l'entità
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        }
+    }
 
 
 }

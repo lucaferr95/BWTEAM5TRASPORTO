@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -66,7 +67,7 @@ public class Main {
                             System.out.println("Accesso eseguito, " + username);
 
                             if (utente.getTipoUtente() == TipoUtente.PLEBEO) {
-                                menuPlebeo(utente, tesseraDao, titoloDiViaggioDao, rivenditoreDao);
+                                menuPlebeo(utente, tesseraDao, titoloDiViaggioDao, rivenditoreDao, trattaDao, mezziDao);
                             } else {
                                 menuPatrizio(mezziDao, periodicoDao, titoloDiViaggioDao, trattaDao, scanner,rivenditoreDao);
                             }
@@ -119,7 +120,8 @@ public class Main {
 
     }
 
-    public static void menuPlebeo(Utente utente, TesseraDao tesseraDao, TitoloDiViaggioDao titoloDao, RivenditoreDao rivenditoreDao) {
+    public static void menuPlebeo(Utente utente, TesseraDao tesseraDao, TitoloDiViaggioDao titoloDao,
+                                  RivenditoreDao rivenditoreDao, TrattaDAO trattaDAO, MezziDao mezziDao) {
         Scanner scanner = new Scanner(System.in);
         boolean continua = true;
 
@@ -130,6 +132,7 @@ public class Main {
             System.out.println("3) Acquista abbonamento");
             System.out.println("4) Verifica validità abbonamento");
             System.out.println("5) Crea tessera"); //aggiungo crea tessera
+            System.out.println("6) Percorri una tratta");
             System.out.println("0) Logout");
             System.out.print("Scelta: ");
             String scelta1 = scanner.nextLine();
@@ -185,7 +188,15 @@ public class Main {
 
                     Biglietto biglietto = new Biglietto(LocalDate.now(), utente);
                     biglietto.setRivenditore(rivenditoreScelto);
-                    titoloDao.save(biglietto);
+                    biglietto.setUtente(utente); // Non obbligatorio se già passato nel costruttore, ma va bene
+
+                    // Inizializza la lista se è null
+                    if (utente.getBiglietti() == null) {
+                        utente.setBiglietti(new ArrayList<>());
+                    }
+                    utente.getBiglietti().add(biglietto);
+
+                    titoloDao.save(biglietto); // Salva dopo aver fatto tutti i set
 
                     System.out.println("Biglietto emesso con codice: " + biglietto.getId());
                 }
@@ -262,6 +273,56 @@ public class Main {
                         System.out.println("Errore durante la creazione della tessera: " + e.getMessage());
                     }
                 }
+                case "6" -> {
+                    System.out.println("Quale tratta vuoi percorrere? ");
+                    List<Tratta> tratte = trattaDAO.listaTratte();
+                    tratte.forEach(t -> System.out.println("ID: " + t.getId() + ", Nome: " + t.getNomeTratta()));
+                    Long trattaId = Long.parseLong(scanner.nextLine());
+
+                    Tratta tratta = trattaDAO.cercaTrattaById(trattaId);
+                    if (tratta == null) {
+                        System.out.println("Tratta non trovata, bro.");
+                        break;
+                    }
+
+                    Mezzi mezzo = tratta.getMezzo();
+                    if (mezzo == null) {
+                        System.out.println("Nessun mezzo assegnato a questa tratta, sciagurato.");
+                        break;
+                    }
+
+                    Tessera tessera = tesseraDao.cercaTesseraPerUtente(utente.getId());
+                    boolean haAbbonamentoValido = false;
+                    if (tessera != null && tessera.getAbbonamento() != null) {
+                        Abbonamento abbonamento = tessera.getAbbonamento();
+                        if (abbonamento.getDataScadenza().isAfter(LocalDate.now())) {
+                            haAbbonamentoValido = true;
+                        }
+                    }
+
+                    List<Biglietto> biglietti = utente.getBiglietti();
+                    Biglietto bigliettoValido = null;
+                    if (biglietti != null) {
+                        for (Biglietto b : biglietti) {
+                            if (b.getMezzo() == null) {
+                                bigliettoValido = b;
+                            }
+                        }
+                    }
+
+                    if (haAbbonamentoValido) {
+                        System.out.println("Accesso alla tratta consentito con abbonamento. Bravo, ottima scelta.");
+                    } else if (bigliettoValido != null) {
+                        bigliettoValido.setMezzo(mezzo);
+                        bigliettoValido.setValidazione(true);
+                        mezzo.setNumerovidimazioni(mezzo.getNumerovidimazioni() + 1);
+                        mezziDao.update(mezzo);
+                        titoloDao.update(bigliettoValido); // Assicurati che questo metodo esista nel DAO
+                        System.out.println("Accesso consentito con biglietto. Hai preso il mezzo ID: " + mezzo.getId() + ". Buon viaggio, viaggiatore.");
+                    } else {
+                        System.out.println("Non hai titoli di viaggio validi. Acquista un biglietto o un abbonamento, capra.");
+                    }
+                }
 
                 case "0" -> continua = false;
                 default -> System.out.println("Scelta non valida.");
@@ -280,7 +341,7 @@ public class Main {
             System.out.println("2) Cambia stato del mezzo");
             System.out.println("3) Numero biglietti e abbonamenti emessi in un giorno");// MACCHINETTA E TEMPO
             System.out.println("4) Cerca mezzi per tratta");
-            System.out.println("5) Calcola tempo medio effettivo per tratta da parte di un mezzo");
+            System.out.println("5) Cerca biglietti vidimati per mezzo");
             System.out.println("6) Iscrivi un nuovo rivenditore ");
             System.out.println("7) Crea una tratta ");
             System.out.println("8) Associa mezzo a tratta ");
@@ -316,8 +377,6 @@ public class Main {
                     }
                     System.out.print("Posti disponibili: ");
                     int posti = Integer.parseInt(scanner.nextLine());
-                    System.out.print("numero vidimazioni per il viaggio: ");
-                    // int vidimazioni = Integer.parseInt(scanner.nextLine());
 
                     Mezzi mezzo = new Mezzi(tipo,nuovoStato,posti/*,vidimazioni*/);
                     mezziDao.save(mezzo);
@@ -370,17 +429,14 @@ public class Main {
                     }
                 }
                 case "5" -> {
-                    System.out.print("ID del mezzo: ");
-                    Long mezzoId = Long.parseLong(scanner.nextLine());
-                    System.out.print("ID della tratta: ");
-                    Long trattaId = Long.parseLong(scanner.nextLine());
+                    System.out.println("Di quale mezzo vuoi controllare le vidimazioni? ");
+                    List<Mezzi> mezzi = mezziDao.listaMezzi();
+                    mezzi.forEach(m -> System.out.println("ID: " + m.getId() + ", Tipo: " + m.getTipoMezzo()
+                            + ", Stato: " + m.getStatoAttuale()));
 
-                    Double media = trattaDao.calcolaTempoMedioEffettivo(mezzoId, trattaId);
-                    if (media != null) {
-                        System.out.println("Tempo medio effettivo: " + media + " minuti");
-                    } else {
-                        System.out.println("Nessuna percorrenza trovata per questo mezzo su questa tratta.");
-                    }
+                    long mezzoId = Long.parseLong(scanner.nextLine());
+                    System.out.println(mezziDao.countBigliettiVidimatiPerMezzo(mezzoId));
+
                 }
                 case "6" -> {
                     System.out.print("Vuoi creare un sito fisico (1) o una macchinetta (2)? ");
@@ -441,7 +497,7 @@ public class Main {
                     String zonaArrivo = scanner.nextLine();
 
 
-                    System.out.println("Inserisci il tempo previsto per la tratta (HH:mm): ");
+                    System.out.println("Inserisci il tempo effettivo per la tratta (HH:mm): ");
                     String inputTempo = scanner.nextLine();
 
                     LocalTime tempoPrevisto = null;
@@ -469,7 +525,8 @@ public class Main {
 
                     System.out.println("A quale veicolo vuoi associare la tratta?");
                     List<Mezzi> mezzi = mezziDao.listaMezzi();
-                    mezzi.forEach(m -> System.out.println("ID: " + m.getId() + ", Tipo: " + m.getTipoMezzo() + ", Stato: " + m.getStatoAttuale()));
+                    mezzi.forEach(m -> System.out.println("ID: " + m.getId() + ", Tipo: " + m.getTipoMezzo()
+                            + ", Stato: " + m.getStatoAttuale()));
 
                     long mezzoId = Long.parseLong(scanner.nextLine());
 
@@ -490,4 +547,5 @@ public class Main {
             }
         }
     }
+
 }
